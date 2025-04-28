@@ -1,0 +1,413 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProfilePage.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debug</a> &gt; <a href="index.source.html" class="el_package">com.example.cyclonecarpool.user</a> &gt; <span class="el_source">ProfilePage.java</span></div><h1>ProfilePage.java</h1><pre class="source lang-java linenums">package com.example.cyclonecarpool.user;
+
+import android.app.AlertDialog;
+import android.content.Intent;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+import com.example.cyclonecarpool.utils.API;
+import com.example.cyclonecarpool.utils.CircleBorderTransform;
+import com.example.cyclonecarpool.HomePage;
+import com.example.cyclonecarpool.trips.MyTripPage;
+import com.example.cyclonecarpool.R;
+import com.example.cyclonecarpool.utils.ImageHelper;
+import com.example.cyclonecarpool.utils.VolleySingleton;
+import com.example.cyclonecarpool.chat.ChatsPage;
+import com.google.gson.Gson;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * The ProfilePage class represents the activity for displaying and managing a user's profile.
+ * This is where the user can edit their profile information, including changing their
+ * username or email address. It is also where the user can see their average rating.
+ *
+ * @author Tyler Gorton
+ */
+<span class="fc" id="L52">public class ProfilePage extends AppCompatActivity implements View.OnClickListener {</span>
+
+<span class="fc" id="L54">    public String role = null;</span>
+<span class="fc" id="L55">    public Integer userId = null;</span>
+    public User user;
+
+    private Button homeNavBtn, tripsNavBtn, messagesTripBtn, paymentBtn;
+    private ImageView profileBtn;
+
+    private ImageView profilePic;
+    private TextView profileName, profileEmail, profileRating;
+    private EditText profileEditFirst, profileEditLast, profileEditEmail;
+    private Button profileEditBtn, profileConfirmBtn, profileDeleteBtn;
+
+<span class="fc" id="L66">    private boolean isEdit = false;</span>
+
+<span class="fc" id="L68">    private Gson gson = new Gson();</span>
+
+    /**
+     * Performs initialization tasks when the activity is created. Sets up UI elements and event
+     * listeners and then calls helper methods to fetch the user's profile information.
+     *
+     * @param savedInstanceState The saved state of the activity
+     */
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+<span class="fc" id="L78">        super.onCreate(savedInstanceState);</span>
+
+<span class="fc" id="L80">        requestWindowFeature(Window.FEATURE_NO_TITLE);</span>
+<span class="fc" id="L81">        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);</span>
+<span class="fc" id="L82">        getSupportActionBar().hide();</span>
+
+<span class="fc" id="L84">        Intent intent = getIntent();</span>
+<span class="pc bpc" id="L85" title="3 of 6 branches missed.">        if (intent != null &amp;&amp; intent.hasExtra(&quot;userId&quot;) &amp;&amp; intent.hasExtra(&quot;role&quot;)) {</span>
+<span class="fc" id="L86">            int userId = intent.getIntExtra(&quot;userId&quot;, -1); // Default to -1 if not found</span>
+<span class="fc" id="L87">            String role = intent.getStringExtra(&quot;role&quot;);</span>
+
+            // Set the userId and role in HomePage
+<span class="fc" id="L90">            this.userId = userId;</span>
+<span class="fc" id="L91">            this.role = role;</span>
+        }
+
+<span class="fc" id="L94">        setContentView(R.layout.profile_screen);</span>
+
+<span class="fc" id="L96">        homeNavBtn = findViewById(R.id.house_navBtn);</span>
+<span class="fc" id="L97">        tripsNavBtn = findViewById(R.id.trips_navBtn);</span>
+<span class="fc" id="L98">        messagesTripBtn = findViewById(R.id.messages_navBtn);</span>
+<span class="fc" id="L99">        profileBtn = findViewById(R.id.profileBtn);</span>
+<span class="fc" id="L100">        paymentBtn = findViewById(R.id.profile_pay_btn);</span>
+
+<span class="fc" id="L102">        profilePic = findViewById(R.id.profile_pic);</span>
+<span class="fc" id="L103">        profileName = findViewById(R.id.profile_name);</span>
+<span class="fc" id="L104">        profileEmail = findViewById(R.id.profile_email);</span>
+<span class="fc" id="L105">        profileRating = findViewById(R.id.profile_rating);</span>
+<span class="fc" id="L106">        profileEditBtn = findViewById(R.id.profile_edit_btn);</span>
+
+<span class="fc" id="L108">        profileEditFirst = findViewById(R.id.profile_edit_fname);</span>
+<span class="fc" id="L109">        profileEditLast = findViewById(R.id.profile_edit_lname);</span>
+<span class="fc" id="L110">        profileEditEmail = findViewById(R.id.profile_edit_email);</span>
+<span class="fc" id="L111">        profileConfirmBtn = findViewById(R.id.profile_confirm_btn);</span>
+<span class="fc" id="L112">        profileDeleteBtn = findViewById(R.id.profile_delete_btn);</span>
+
+<span class="fc" id="L114">        homeNavBtn.setOnClickListener(this);</span>
+<span class="fc" id="L115">        tripsNavBtn.setOnClickListener(this);</span>
+<span class="fc" id="L116">        messagesTripBtn.setOnClickListener(this);</span>
+<span class="fc" id="L117">        profileBtn.setOnClickListener(this);</span>
+<span class="fc" id="L118">        profileEditBtn.setOnClickListener(this);</span>
+<span class="fc" id="L119">        profileConfirmBtn.setOnClickListener(this);</span>
+<span class="fc" id="L120">        profileDeleteBtn.setOnClickListener(this);</span>
+<span class="fc" id="L121">        paymentBtn.setOnClickListener(this);</span>
+
+<span class="fc" id="L123">        makeProfilePicReq();</span>
+<span class="fc" id="L124">        reqProfile();</span>
+<span class="fc" id="L125">        fetchRating();</span>
+<span class="fc" id="L126">    }</span>
+
+    /**
+     * Handles click events on UI elements within this activity. For the navigation buttons, this
+     * method navigates to the corresponding activity. This method also handles button interactions
+     * relating to editing or deleting the profile.
+     *
+     * @param v The view that was clicked
+     */
+    @Override
+    public void onClick(View v) {
+<span class="fc" id="L137">        int id = v.getId();</span>
+<span class="pc bpc" id="L138" title="1 of 2 branches missed.">        if (id == R.id.house_navBtn) {</span>
+<span class="nc" id="L139">            Intent intent = new Intent(this, HomePage.class);</span>
+<span class="nc" id="L140">            intent.putExtra(&quot;userId&quot;, userId);</span>
+<span class="nc" id="L141">            intent.putExtra(&quot;role&quot;, role);</span>
+<span class="nc" id="L142">            startActivity(intent);</span>
+<span class="pc bpc" id="L143" title="1 of 2 branches missed.">        } else if(id == R.id.trips_navBtn) {</span>
+<span class="nc" id="L144">            Intent intent = new Intent(this, MyTripPage.class);</span>
+<span class="nc" id="L145">            intent.putExtra(&quot;userId&quot;, userId);</span>
+<span class="nc" id="L146">            intent.putExtra(&quot;role&quot;, role);</span>
+<span class="nc" id="L147">            startActivity(intent);</span>
+<span class="pc bpc" id="L148" title="1 of 2 branches missed.">        } else if(id == R.id.profile_pay_btn) {</span>
+<span class="nc" id="L149">            Intent intent = new Intent(this, Payments.class);</span>
+<span class="nc" id="L150">            intent.putExtra(&quot;userId&quot;, userId);</span>
+<span class="nc" id="L151">            intent.putExtra(&quot;role&quot;, role);</span>
+<span class="nc" id="L152">            startActivity(intent);</span>
+<span class="pc bpc" id="L153" title="1 of 2 branches missed.">        } else if (id == R.id.messages_navBtn) {</span>
+<span class="nc" id="L154">            Intent intent = new Intent(this, ChatsPage.class);</span>
+<span class="nc" id="L155">            intent.putExtra(&quot;userId&quot;, userId);</span>
+<span class="nc" id="L156">            intent.putExtra(&quot;role&quot;, role);</span>
+<span class="nc" id="L157">            startActivity(intent);</span>
+<span class="pc bpc" id="L158" title="1 of 2 branches missed.">        } else if (id == R.id.profileBtn) {</span>
+
+<span class="fc bfc" id="L160" title="All 2 branches covered.">        } else if (id == R.id.profile_edit_btn) {</span>
+<span class="fc" id="L161">            toggleEdit();</span>
+<span class="pc bpc" id="L162" title="1 of 2 branches missed.">        } else if (id == R.id.profile_confirm_btn) {</span>
+<span class="fc" id="L163">            putProfile();</span>
+<span class="nc bnc" id="L164" title="All 2 branches missed.">        } else if (id == R.id.profile_delete_btn) {</span>
+<span class="nc" id="L165">            new AlertDialog.Builder(this)</span>
+<span class="nc" id="L166">                    .setTitle(&quot;Delete Profile&quot;)</span>
+<span class="nc" id="L167">                    .setMessage(&quot;Are you sure you want to delete your profile? This action cannot be undone.&quot;)</span>
+<span class="nc" id="L168">                    .setPositiveButton(android.R.string.yes, (dialog, which) -&gt; deleteProfile())</span>
+<span class="nc" id="L169">                    .setNegativeButton(android.R.string.no, null)</span>
+<span class="nc" id="L170">                    .show();</span>
+        }
+<span class="fc" id="L172">    }</span>
+
+    /**
+     * Toggles the visibility of the profile edit fields and buttons.
+     */
+    private void toggleEdit() {
+<span class="fc bfc" id="L178" title="All 2 branches covered.">        if (isEdit) {</span>
+<span class="fc" id="L179">            profileName.setVisibility(View.VISIBLE);</span>
+<span class="fc" id="L180">            profileEmail.setVisibility(View.VISIBLE);</span>
+
+<span class="fc" id="L182">            profileEditFirst.setVisibility(View.INVISIBLE);</span>
+<span class="fc" id="L183">            profileEditLast.setVisibility(View.INVISIBLE);</span>
+<span class="fc" id="L184">            profileEditEmail.setVisibility(View.INVISIBLE);</span>
+
+<span class="fc" id="L186">            profileEditBtn.setVisibility(View.VISIBLE);</span>
+<span class="fc" id="L187">            profileDeleteBtn.setVisibility(View.INVISIBLE);</span>
+<span class="fc" id="L188">            profileConfirmBtn.setVisibility(View.INVISIBLE);</span>
+
+<span class="fc" id="L190">            isEdit = false;</span>
+        } else {
+<span class="fc" id="L192">            profileName.setVisibility(View.INVISIBLE);</span>
+<span class="fc" id="L193">            profileEmail.setVisibility(View.INVISIBLE);</span>
+
+<span class="fc" id="L195">            profileEditFirst.setVisibility(View.VISIBLE);</span>
+<span class="fc" id="L196">            profileEditLast.setVisibility(View.VISIBLE);</span>
+<span class="fc" id="L197">            profileEditEmail.setVisibility(View.VISIBLE);</span>
+
+<span class="fc" id="L199">            profileEditBtn.setVisibility(View.INVISIBLE);</span>
+<span class="fc" id="L200">            profileDeleteBtn.setVisibility(View.VISIBLE);</span>
+<span class="fc" id="L201">            profileConfirmBtn.setVisibility(View.VISIBLE);</span>
+
+<span class="fc" id="L203">            isEdit = true;</span>
+        }
+<span class="fc" id="L205">    }</span>
+
+    /**
+     * Populates the profile fields with the user's information.
+     *
+     * @param profile The user object containing the profile information.
+     */
+    private void populateProfile(User profile) {
+<span class="fc" id="L213">        profileName.setText(String.format(&quot;%s %s&quot;, profile.getFirstname(), profile.getLastname()));</span>
+<span class="fc" id="L214">        profileEmail.setText(profile.getEmail());</span>
+<span class="fc" id="L215">        ImageHelper.loadProfilePic(this, profile.getProfilePicture(), profilePic);</span>
+<span class="fc" id="L216">    }</span>
+
+    /**
+     * Fetches the user's profile information from the server. Takes the ID of the user whose
+     * profile is to be fetched as a parameter. Uses Volley to make the request and calls the
+     * populateProfile method to populate the profile fields.
+     *
+     * @param userId the ID of the user profile to fetch
+     */
+    private void reqProfile(int userId) {
+<span class="fc" id="L226">        JsonObjectRequest profileRequest = new JsonObjectRequest(</span>
+                Request.Method.GET,
+                API.USER_URL + userId,
+                null,
+<span class="fc" id="L230">                new Response.Listener&lt;JSONObject&gt;() {</span>
+                    @Override
+                    public void onResponse(JSONObject response) {
+<span class="fc" id="L233">                        Log.d(&quot;[User] Volley Response&quot;, response.toString());</span>
+<span class="fc" id="L234">                        user = gson.fromJson(String.valueOf(response), User.class);</span>
+<span class="fc" id="L235">                        populateProfile(user);</span>
+<span class="fc" id="L236">                    }</span>
+                },
+<span class="nc" id="L238">                error -&gt; Log.e(&quot;[Profile] Volley Error&quot;, error.toString())</span>
+        );
+<span class="fc" id="L240">        VolleySingleton.getInstance(getApplicationContext())</span>
+<span class="fc" id="L241">                       .addToRequestQueue(profileRequest);</span>
+<span class="fc" id="L242">    }</span>
+
+    public void reqProfile() {
+        try {
+<span class="fc" id="L246">            reqProfile(userId);</span>
+<span class="pc" id="L247">        } catch (Exception e) {}</span>
+<span class="fc" id="L248">    }</span>
+
+    /**
+     * Fetches the user's average rating from the server. Takes the ID of the user for which to
+     * fetch the rating as a parameter. Uses Volley to make the request.
+     *
+     * @param userId the ID of the user for which to fetch the rating
+     */
+    private void fetchRating(int userId) {
+<span class="fc" id="L257">        StringRequest ratingRequest = new StringRequest(</span>
+                Request.Method.GET,
+                API.USER_URL + userId + &quot;/review&quot;,
+                response -&gt; {
+<span class="fc" id="L261">                    double rating = Double.parseDouble(response);</span>
+<span class="fc" id="L262">                    profileRating.setText(String.format(&quot;%s%s&quot;, profileRating.getText().toString(), rating));</span>
+<span class="fc" id="L263">                },</span>
+                error -&gt; {
+<span class="nc bnc" id="L265" title="All 6 branches missed.">                    if (error != null &amp;&amp; error.networkResponse != null &amp;&amp; error.networkResponse.statusCode == 404) {</span>
+<span class="nc" id="L266">                        profileRating.setText(String.format(&quot;%s%s&quot;, profileRating.getText().toString(), &quot;---&quot;));</span>
+                    } else {
+<span class="nc" id="L268">                        Log.e(&quot;Rating Request&quot;, &quot;Error fetching rating&quot;, error);</span>
+                    }
+<span class="nc" id="L270">                }</span>
+        );
+<span class="fc" id="L272">        VolleySingleton.getInstance(this).addToRequestQueue(ratingRequest);</span>
+<span class="fc" id="L273">    }</span>
+
+    public void fetchRating() {
+        try {
+<span class="fc" id="L277">            fetchRating(userId);</span>
+<span class="pc" id="L278">        } catch (Exception e) {}</span>
+<span class="fc" id="L279">    }</span>
+
+    /**
+     * Updates the user's profile information on the server. Gets the updated information from the
+     * input fields, then uses Volley to make the request and calls the populateProfile method in
+     * the response handler to refresh the UI.
+     */
+    private void putProfile() {
+<span class="pc bpc" id="L287" title="1 of 2 branches missed.">        String newFirstName = (profileEditFirst.getText().length() &gt; 0) ?</span>
+<span class="fc" id="L288">                profileEditFirst.getText().toString()</span>
+<span class="pc" id="L289">                : user.getFirstname();</span>
+<span class="pc bpc" id="L290" title="1 of 2 branches missed.">        String newLastName = (profileEditLast.getText().length() &gt; 0) ?</span>
+<span class="fc" id="L291">                profileEditLast.getText().toString()</span>
+<span class="pc" id="L292">                : user.getLastname();</span>
+<span class="pc bpc" id="L293" title="1 of 2 branches missed.">        String newEmail = (profileEditEmail.getText().length() &gt; 0) ?</span>
+<span class="nc" id="L294">                profileEditEmail.getText().toString()</span>
+<span class="fc" id="L295">                : user.getEmail();</span>
+<span class="pc bpc" id="L296" title="1 of 2 branches missed.">        String newProfilePic = (user.getProfilePicture() == null) ?</span>
+<span class="nc" id="L297">                &quot;https://firebasestorage.googleapis.com/v0/b/cyclonecarpool.appspot.com/o/placeholderprofilepic.png?alt=media&amp;token=1e53480d-f70e-4be3-8e73-03c5c8fe4b3d&quot;</span>
+<span class="fc" id="L298">                : user.getProfilePicture();</span>
+<span class="fc" id="L299">        User newUser = new User(user.getId(), newFirstName, newLastName, newEmail, user.getPassword(), user.getRole(), newProfilePic);</span>
+<span class="fc" id="L300">        Log.d(&quot;[Profile] Put User&quot;, gson.toJson(newUser));</span>
+
+<span class="fc" id="L302">        JsonObjectRequest profilePutRequest = new JsonObjectRequest(</span>
+                Request.Method.PUT,
+                API.USER_URL + &quot;editProfile/&quot; + userId,
+                null,
+<span class="fc" id="L306">                new Response.Listener&lt;JSONObject&gt;() {</span>
+                    @Override
+                    public void onResponse(JSONObject response) {
+<span class="fc" id="L309">                        user = gson.fromJson(response.toString(), User.class);</span>
+<span class="fc" id="L310">                        populateProfile(user);</span>
+<span class="fc" id="L311">                    }</span>
+                },
+                error -&gt; {
+<span class="nc bnc" id="L314" title="All 2 branches missed.">                    if (error.getMessage() != null) {</span>
+<span class="nc" id="L315">                        Log.e(&quot;[Profile] Volley Error&quot;, error.getMessage());</span>
+                    } else {
+<span class="nc" id="L317">                        Log.e(&quot;[Profile] Volley Error&quot;, error.toString());</span>
+                    }
+<span class="nc" id="L319">                }</span>
+<span class="fc" id="L320">        ) {</span>
+            @Override
+            public Map&lt;String, String&gt; getHeaders() {
+<span class="fc" id="L323">                Map&lt;String, String&gt; headers = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L324">                headers.put(&quot;Content-Type&quot;, &quot;application/json&quot;);</span>
+<span class="fc" id="L325">                headers.put(&quot;Accept&quot;, &quot;application/json&quot;);</span>
+<span class="fc" id="L326">                return headers;</span>
+            }
+            @Override
+            public byte[] getBody() {
+<span class="fc" id="L330">                return gson.toJson(newUser).getBytes(StandardCharsets.UTF_8);</span>
+            }
+        };
+<span class="fc" id="L333">        VolleySingleton.getInstance(getApplicationContext())</span>
+<span class="fc" id="L334">                       .addToRequestQueue(profilePutRequest);</span>
+<span class="fc" id="L335">        toggleEdit();</span>
+<span class="fc" id="L336">    }</span>
+
+    /**
+     * Deletes the user's profile from the server. Uses standard HTTP methods to make the request
+     * and navigates back to the WelcomePage activity after successful deletion.
+     */
+    private void deleteProfile() {
+<span class="nc" id="L343">        new Thread(() -&gt; {</span>
+            try {
+                // Replace with your backend URL
+<span class="nc" id="L346">                URL url = new URL(API.USER_URL + userId);</span>
+<span class="nc" id="L347">                HttpURLConnection conn = (HttpURLConnection) url.openConnection();</span>
+<span class="nc" id="L348">                conn.setRequestMethod(&quot;DELETE&quot;);</span>
+<span class="nc" id="L349">                conn.setConnectTimeout(5000);</span>
+<span class="nc" id="L350">                conn.setReadTimeout(5000);</span>
+
+<span class="nc" id="L352">                int responseCode = conn.getResponseCode();</span>
+<span class="nc bnc" id="L353" title="All 2 branches missed.">                if (responseCode == HttpURLConnection.HTTP_NO_CONTENT) {</span>
+<span class="nc" id="L354">                    runOnUiThread(() -&gt; {</span>
+                        // Profile deleted successfully, maybe show a toast or navigate away
+<span class="nc" id="L356">                        Toast.makeText(this, &quot;Profile deleted successfully.&quot;, Toast.LENGTH_SHORT).show();</span>
+                        // Navigate to a different activity if needed
+<span class="nc" id="L358">                        Intent intent = new Intent(ProfilePage.this, WelcomePage.class);</span>
+<span class="nc" id="L359">                        startActivity(intent);</span>
+<span class="nc" id="L360">                        finish();</span>
+<span class="nc" id="L361">                    });</span>
+<span class="nc bnc" id="L362" title="All 2 branches missed.">                } else if (responseCode == HttpURLConnection.HTTP_NOT_FOUND) {</span>
+<span class="nc" id="L363">                    runOnUiThread(() -&gt;</span>
+<span class="nc" id="L364">                            Toast.makeText(this, &quot;Profile not found.&quot;, Toast.LENGTH_SHORT).show());</span>
+                } else {
+<span class="nc" id="L366">                    runOnUiThread(() -&gt;</span>
+<span class="nc" id="L367">                            Toast.makeText(this, &quot;Failed to delete profile. Try again.&quot;, Toast.LENGTH_SHORT).show());</span>
+                }
+<span class="nc" id="L369">            } catch (Exception e) {</span>
+<span class="nc" id="L370">                Log.e(&quot;Delete Profile&quot;, &quot;Error deleting profile&quot;, e);</span>
+<span class="nc" id="L371">                runOnUiThread(() -&gt;</span>
+<span class="nc" id="L372">                        Toast.makeText(this, &quot;Error deleting profile. Try again.&quot;, Toast.LENGTH_SHORT).show());</span>
+<span class="nc" id="L373">            }</span>
+<span class="nc" id="L374">        }).start();</span>
+<span class="nc" id="L375">    }</span>
+
+    /**
+     * Fetches the user's profile picture URL from the server. Uses standard HTTP methods to make
+     * the request and calls &lt;code&gt;ImageHelper.loadProfilePic&lt;/code&gt; to display the profile picture
+     * in the UI.
+     */
+    private void makeProfilePicReq() {
+<span class="fc" id="L383">        new Thread(() -&gt; {</span>
+            try {
+<span class="fc" id="L385">                URL url = new URL(API.USER_URL + &quot;profilePic/&quot; + userId);</span>
+<span class="fc" id="L386">                HttpURLConnection conn = (HttpURLConnection) url.openConnection();</span>
+<span class="fc" id="L387">                conn.setRequestMethod(&quot;GET&quot;);</span>
+<span class="fc" id="L388">                conn.setConnectTimeout(5000);</span>
+<span class="fc" id="L389">                conn.setReadTimeout(5000);</span>
+
+<span class="fc" id="L391">                int responseCode = conn.getResponseCode();</span>
+<span class="pc bpc" id="L392" title="1 of 2 branches missed.">                if (responseCode == HttpURLConnection.HTTP_OK) {</span>
+<span class="fc" id="L393">                    BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));</span>
+<span class="fc" id="L394">                    StringBuilder response = new StringBuilder();</span>
+                    String inputLine;
+<span class="fc bfc" id="L396" title="All 2 branches covered.">                    while ((inputLine = in.readLine()) != null) {</span>
+<span class="fc" id="L397">                        response.append(inputLine);</span>
+                    }
+<span class="fc" id="L399">                    in.close();</span>
+
+<span class="fc" id="L401">                    String profilePicUrl = response.toString().trim();</span>
+
+<span class="fc" id="L403">                    runOnUiThread(() -&gt; ImageHelper.loadProfilePic(ProfilePage.this, profilePicUrl, profileBtn));</span>
+<span class="fc" id="L404">                } else {</span>
+<span class="nc" id="L405">                    Log.e(&quot;HTTP Request&quot;, &quot;Failed to get profile picture. Response Code: &quot; + responseCode);</span>
+                }
+<span class="nc" id="L407">            } catch (Exception e) {</span>
+<span class="nc" id="L408">                Log.e(&quot;HTTP Request&quot;, &quot;Error fetching profile picture&quot;, e);</span>
+<span class="fc" id="L409">            }</span>
+<span class="fc" id="L410">        }).start();</span>
+<span class="fc" id="L411">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span>Generated by the Android Gradle plugin 8.5.2</div></body></html>

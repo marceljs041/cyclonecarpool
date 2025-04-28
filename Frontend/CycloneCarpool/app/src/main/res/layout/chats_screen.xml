@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF">
+
+<!--    <View-->
+<!--        android:id="@+id/searchBarClosed"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="18dp"-->
+<!--        android:background="#F1BE48"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/rectangle_3" />-->
+
+    <TextView
+        android:id="@+id/page_header"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:background="#C8102E"
+        android:fontFamily="@font/proximanova_extrabold"
+        android:lineHeight="39sp"
+        android:text="@string/messages"
+        android:textAppearance="@style/trips_near_"
+        android:gravity="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+<!--    <LinearLayout-->
+<!--        android:id="@+id/searchBarToggle"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:gravity="center"-->
+<!--        android:orientation="horizontal"-->
+<!--        android:padding="4dp"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent">-->
+
+<!--        <View-->
+<!--            android:id="@+id/polygon_2"-->
+<!--            android:layout_width="8dp"-->
+<!--            android:layout_height="7dp"-->
+<!--            android:background="@drawable/arow_down" />-->
+
+<!--        <TextView-->
+<!--            android:id="@+id/search"-->
+<!--            android:layout_width="33dp"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:fontFamily="@font/proximanova_extrabold"-->
+<!--            android:gravity="center"-->
+<!--            android:text="@string/search"-->
+<!--            android:textAppearance="@style/search" />-->
+
+<!--        <View-->
+<!--            android:id="@+id/polygon_3"-->
+<!--            android:layout_width="8dp"-->
+<!--            android:layout_height="7dp"-->
+<!--            android:background="@drawable/arow_down" />-->
+<!--    </LinearLayout>-->
+
+    <ScrollView
+        android:id="@+id/chatsScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="757dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/page_header">
+
+        <LinearLayout
+            android:id="@+id/chat_Container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+    </ScrollView>
+
+    <View
+        android:id="@+id/rectangle_1"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:background="#C8102E"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/house_navBtn"
+        android:layout_width="36dp"
+        android:layout_height="32dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="35dp"
+        android:background="@drawable/icon_home"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/rectangle_1" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/trips_navBtn"
+        android:layout_width="36dp"
+        android:layout_height="32dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="23dp"
+        android:background="@drawable/icon_road"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/house_navBtn"
+        app:layout_constraintTop_toTopOf="@+id/rectangle_1" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/messages_navBtn"
+        android:layout_width="38dp"
+        android:layout_height="38dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginEnd="22dp"
+        android:background="@drawable/icon_mail_h"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/profileBtn"
+        app:layout_constraintTop_toTopOf="@+id/rectangle_1" />
+
+    <ImageView
+        android:id="@+id/plus_solid"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:translationZ="5dp"
+        app:layout_constraintBottom_toBottomOf="@+id/btnCreate"
+        app:layout_constraintEnd_toEndOf="@+id/btnCreate"
+        app:layout_constraintStart_toStartOf="@+id/btnCreate"
+        app:layout_constraintTop_toTopOf="@+id/btnCreate"
+        app:srcCompat="@drawable/icon_plus" />
+
+    <ImageView
+        android:id="@+id/profileBtn"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginEnd="35dp"
+        android:translationZ="5dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/rectangle_1"
+        app:srcCompat="@drawable/icon_plus" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnCreate"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginBottom="12dp"
+        android:background="@drawable/btn_yellow_circle"
+        android:elevation="4dp"
+        app:layout_constraintBottom_toBottomOf="@+id/rectangle_1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

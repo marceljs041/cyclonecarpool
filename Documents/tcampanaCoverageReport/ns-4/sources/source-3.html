@@ -1,0 +1,248 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > NotificationSocket</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">cycloneCarpool.Notification</a>
+</div>
+
+<h1>Coverage Summary for Class: NotificationSocket (cycloneCarpool.Notification)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">NotificationSocket</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (5/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    17.1%
+  </span>
+  <span class="absValue">
+    (7/41)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package cycloneCarpool.Notification;
+&nbsp;
+&nbsp;import cycloneCarpool.Trips.PassengerTripStatus;
+&nbsp;import cycloneCarpool.Trips.PassengerTripStatusService;
+&nbsp;import cycloneCarpool.Users.User;
+&nbsp;import cycloneCarpool.Users.UserRepository;
+&nbsp;import jakarta.websocket.*;
+&nbsp;import jakarta.websocket.server.PathParam;
+&nbsp;import jakarta.websocket.server.ServerEndpoint;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.stereotype.Controller;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.*;
+&nbsp;
+&nbsp;/**
+&nbsp; * Code Review: Anthony Campana
+&nbsp; * Using websockets for handling real time notifications
+&nbsp; * Uses a hashtable to map session to user id
+&nbsp; * handles onOpen, onNotification, onClose, and onError well using supporting methods if needed.
+&nbsp; */
+&nbsp;
+&nbsp;@Controller
+&nbsp;@ServerEndpoint(value = &quot;/notification/{userId}&quot;)
+<b class="fc">&nbsp;public class NotificationSocket {</b>
+&nbsp;
+&nbsp;    private static UserRepository userRepo;
+&nbsp;
+&nbsp;    @Autowired
+&nbsp;    public void setUserRepository(UserRepository repo) {
+<b class="fc">&nbsp;        userRepo = repo;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static NotificationService notificationService; // Use the service for persistence
+&nbsp;    @Autowired
+&nbsp;    public void setNotificationService(NotificationService service) {
+<b class="fc">&nbsp;        notificationService = service;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static PassengerTripStatusService passengerTripStatusService;
+&nbsp;    @Autowired
+&nbsp;    public void setPassengerTripStatusService(PassengerTripStatusService service) {
+<b class="fc">&nbsp;        passengerTripStatusService = service;</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger logger = LoggerFactory.getLogger(NotificationSocket.class);</b>
+&nbsp;
+<b class="fc">&nbsp;    private static Map&lt;Session, Long&gt; sessionUserIdMap = new Hashtable&lt;&gt;();</b>
+<b class="fc">&nbsp;    private static Map&lt;Long, Session&gt; userIdSessionMap = new Hashtable&lt;&gt;();</b>
+&nbsp;
+&nbsp;    @OnOpen
+&nbsp;    public void onOpen(Session session, @PathParam(&quot;userId&quot;) Long userId) throws IOException {
+<b class="nc">&nbsp;        User user = userRepo.findById(userId).orElseThrow(() -&gt; new RuntimeException(&quot;User not found&quot;));</b>
+<b class="nc">&nbsp;        logger.info(&quot;Connection opened for userId: {}&quot;, userId);</b>
+&nbsp;
+<b class="nc">&nbsp;        sessionUserIdMap.put(session, userId);</b>
+<b class="nc">&nbsp;        userIdSessionMap.put(userId, session);</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;Notification&gt; unsentNotifications = notificationService.getUnsendNotifications(userId);</b>
+&nbsp;
+&nbsp;        // Send each unsent notification to the user
+<b class="nc">&nbsp;        for (Notification notification : unsentNotifications) {</b>
+<b class="nc">&nbsp;            sendNotification(notification);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @OnMessage
+&nbsp;    public void onNotification(Session session, String ptsId) {
+<b class="nc">&nbsp;        Long passengerTripStatusId = Long.parseLong(ptsId);</b>
+&nbsp;
+&nbsp;        // Lookup PassengerTripStatus by ID
+<b class="nc">&nbsp;        PassengerTripStatus passengerTripStatus = passengerTripStatusService.getPassengerTripStatusById(passengerTripStatusId);</b>
+&nbsp;
+<b class="nc">&nbsp;        String status = passengerTripStatus.getStatus();</b>
+&nbsp;
+<b class="nc">&nbsp;        logger.info(&quot;Handling notification of {} request&quot;, status);</b>
+&nbsp;
+&nbsp;        // Framework implemented for notifying other passengers in the same trip.
+<b class="nc">&nbsp;        List&lt;Notification&gt; notifications = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (Objects.equals(status, &quot;PENDING&quot;)) {</b>
+<b class="nc">&nbsp;            notifications.add(notificationService.notifyDriverOfRequest(passengerTripStatus));</b>
+<b class="nc">&nbsp;        } else if (Objects.equals(status, &quot;ACCEPTED&quot;)) {</b>
+<b class="nc">&nbsp;            notifications.add(notificationService.notifyPassengerOfApproval(passengerTripStatus));</b>
+<b class="nc">&nbsp;        } else if (Objects.equals(status, &quot;REJECTED&quot;)) {</b>
+<b class="nc">&nbsp;            notifications.add(notificationService.notifyPassengerOfDecline(passengerTripStatus));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        for (Notification notification : notifications) {</b>
+<b class="nc">&nbsp;            sendNotification(notification);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void sendNotification(Notification notification) {
+<b class="nc">&nbsp;        Long receiverId = notification.getReceiver().getId();</b>
+<b class="nc">&nbsp;        Session session = userIdSessionMap.get(receiverId);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (session != null &amp;&amp; session.isOpen()) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                session.getBasicRemote().sendText(notification.getContent());</b>
+<b class="nc">&nbsp;                notificationService.notified(notification);</b>
+&nbsp;
+<b class="nc">&nbsp;            } catch (IOException e) {</b>
+<b class="nc">&nbsp;                logger.error(&quot;Failed to send notification to userId: {}&quot;, receiverId, e);</b>
+&nbsp;
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            logger.info(&quot;No active session found for userId: {}.&quot;, receiverId);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    @OnClose
+&nbsp;    public void onClose(Session session, @PathParam(&quot;tripId&quot;) String tripId) throws IOException {
+<b class="nc">&nbsp;        Long userId = sessionUserIdMap.get(session);</b>
+<b class="nc">&nbsp;        User user = userRepo.findById(userId).orElseThrow(() -&gt; new RuntimeException(&quot;User not found&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        sessionUserIdMap.remove(session);</b>
+<b class="nc">&nbsp;        userIdSessionMap.remove(userId);</b>
+<b class="nc">&nbsp;        logger.info(&quot;Connection closed for userId: {}&quot;, userId);</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    @OnError
+&nbsp;    public void onError(Session session, Throwable throwable) {
+<b class="nc">&nbsp;        logger.error(&quot;Error in WebSocket session {}&quot;, session.getId(), throwable);</b>
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-12-04 23:48</div>
+</div>
+</body>
+</html>

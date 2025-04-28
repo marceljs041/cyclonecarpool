@@ -1,0 +1,252 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ChatSocket</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">cycloneCarpool.Messages</a>
+</div>
+
+<h1>Coverage Summary for Class: ChatSocket (cycloneCarpool.Messages)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ChatSocket</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (4/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    13.3%
+  </span>
+  <span class="absValue">
+    (6/45)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package cycloneCarpool.Messages;
+&nbsp;
+&nbsp;import cycloneCarpool.Users.User;
+&nbsp;import cycloneCarpool.Users.UserRepository;
+&nbsp;import jakarta.websocket.OnClose;
+&nbsp;import jakarta.websocket.OnError;
+&nbsp;import jakarta.websocket.OnMessage;
+&nbsp;import jakarta.websocket.OnOpen;
+&nbsp;import jakarta.websocket.Session;
+&nbsp;import jakarta.websocket.server.PathParam;
+&nbsp;import jakarta.websocket.server.ServerEndpoint;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.stereotype.Controller;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.Date;
+&nbsp;import java.util.Hashtable;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;@Controller
+&nbsp;@ServerEndpoint(value = &quot;/chat/{tripId}/{userId}&quot;)
+<b class="fc">&nbsp;public class ChatSocket {</b>
+&nbsp;
+&nbsp;    private static MessageRepository msgRepo;
+&nbsp;    private static UserRepository userRepo;
+&nbsp;
+&nbsp;    @Autowired
+&nbsp;    public void setMessageRepository(MessageRepository repo) {
+<b class="fc">&nbsp;        msgRepo = repo;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Autowired
+&nbsp;    public void setUserRepository(UserRepository repo) {
+<b class="fc">&nbsp;        userRepo = repo;</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger logger = LoggerFactory.getLogger(ChatSocket.class);</b>
+<b class="fc">&nbsp;    private static Map&lt;Session, Long&gt; sessionUserIdMap = new Hashtable&lt;&gt;();</b>
+<b class="fc">&nbsp;    private static Map&lt;Long, Session&gt; userIdSessionMap = new Hashtable&lt;&gt;();</b>
+&nbsp;
+&nbsp;    @OnOpen
+&nbsp;    public void onOpen(Session session, @PathParam(&quot;tripId&quot;) Long tripId, @PathParam(&quot;userId&quot;) Long userId) throws IOException {
+<b class="nc">&nbsp;        User user = userRepo.findById(userId).orElseThrow(() -&gt; new RuntimeException(&quot;User not found&quot;));</b>
+<b class="nc">&nbsp;        logger.info(&quot;Connection opened for tripId: &quot; + tripId + &quot;, userId: &quot; + userId);</b>
+&nbsp;
+&nbsp;        // Store session and user info
+<b class="nc">&nbsp;        sessionUserIdMap.put(session, userId);</b>
+<b class="nc">&nbsp;        userIdSessionMap.put(userId, session);</b>
+&nbsp;
+&nbsp;        // Send chat history to the connected user
+<b class="nc">&nbsp;        sendChatHistory(session, tripId);</b>
+&nbsp;
+&nbsp;        // Broadcast that a new user has joined
+<b class="nc">&nbsp;        broadcastToTrip(tripId, &quot;User &quot; + user.getFirstname() + &quot; has joined the chat for trip &quot; + tripId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @OnMessage
+&nbsp;    public void onMessage(Session session, @PathParam(&quot;tripId&quot;) Long tripId, String messageContent) throws IOException {
+<b class="nc">&nbsp;        Long senderId = sessionUserIdMap.get(session);</b>
+<b class="nc">&nbsp;        User sender = userRepo.findById(senderId).orElseThrow(() -&gt; new RuntimeException(&quot;Sender not found&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        if (messageContent.startsWith(&quot;@&quot;)) {</b>
+&nbsp;            // Handle Direct Message (DM)
+<b class="nc">&nbsp;            Long receiverId = Long.parseLong(messageContent.split(&quot; &quot;)[0].substring(1)); // Extract receiverId</b>
+<b class="nc">&nbsp;            User receiver = userRepo.findById(receiverId).orElseThrow(() -&gt; new RuntimeException(&quot;Receiver not found&quot;));</b>
+&nbsp;
+&nbsp;            // Save the DM in the database
+<b class="nc">&nbsp;            Message directMessage = new Message(sender, receiver, messageContent, false);</b>
+<b class="nc">&nbsp;            directMessage.setTimestamp(new Date());</b>
+<b class="nc">&nbsp;            msgRepo.save(directMessage);</b>
+&nbsp;
+&nbsp;            // Send the message only to the sender and receiver
+<b class="nc">&nbsp;            sendMessageToUser(senderId, &quot;You (to &quot; + receiver.getFirstname() + &quot;): &quot; + messageContent);</b>
+<b class="nc">&nbsp;            sendMessageToUser(receiverId, sender.getFirstname() + &quot; (DM): &quot; + messageContent);</b>
+&nbsp;
+&nbsp;        } else {
+&nbsp;            // Handle Group Message
+<b class="nc">&nbsp;            Message groupMessage = new Message(sender, tripId, messageContent, false);</b>
+<b class="nc">&nbsp;            groupMessage.setTimestamp(new Date());</b>
+<b class="nc">&nbsp;            msgRepo.save(groupMessage);</b>
+&nbsp;
+&nbsp;            // Broadcast to all users in the trip
+<b class="nc">&nbsp;            broadcastToTrip(tripId, sender.getFirstname() + &quot;: &quot; + messageContent);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @OnClose
+&nbsp;    public void onClose(Session session, @PathParam(&quot;tripId&quot;) Long tripId) throws IOException {
+<b class="nc">&nbsp;        Long userId = sessionUserIdMap.get(session);</b>
+<b class="nc">&nbsp;        User user = userRepo.findById(userId).orElseThrow(() -&gt; new RuntimeException(&quot;User not found&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        sessionUserIdMap.remove(session);</b>
+<b class="nc">&nbsp;        userIdSessionMap.remove(userId);</b>
+<b class="nc">&nbsp;        logger.info(&quot;Connection closed for userId: &quot; + userId);</b>
+&nbsp;
+<b class="nc">&nbsp;        broadcastToTrip(tripId, &quot;User &quot; + user.getFirstname() + &quot; has left the chat for trip &quot; + tripId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @OnError
+&nbsp;    public void onError(Session session, Throwable throwable) {
+<b class="nc">&nbsp;        logger.error(&quot;Error in WebSocket session &quot; + session.getId(), throwable);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void sendMessageToUser(Long userId, String message) {
+&nbsp;        try {
+<b class="nc">&nbsp;            if (userIdSessionMap.containsKey(userId)) {</b>
+<b class="nc">&nbsp;                userIdSessionMap.get(userId).getBasicRemote().sendText(message);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (IOException e) {</b>
+<b class="nc">&nbsp;            logger.error(&quot;Error sending message to user with ID: &quot; + userId, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void broadcastToTrip(Long tripId, String message) {
+<b class="nc">&nbsp;        sessionUserIdMap.forEach((session, userId) -&gt; {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                session.getBasicRemote().sendText(message);</b>
+<b class="nc">&nbsp;            } catch (IOException e) {</b>
+<b class="nc">&nbsp;                logger.error(&quot;Error broadcasting message to trip &quot; + tripId, e);</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    private void sendChatHistory(Session session, Long tripId) throws IOException {
+&nbsp;        // Retrieve previous messages for the trip
+<b class="nc">&nbsp;        List&lt;Message&gt; messages = msgRepo.findByTripId(tripId);</b>
+&nbsp;
+<b class="nc">&nbsp;        for (Message message : messages) {</b>
+<b class="nc">&nbsp;            String formattedMessage = message.getSender().getFirstname() + &quot;: &quot; + message.getContent();</b>
+<b class="nc">&nbsp;            session.getBasicRemote().sendText(formattedMessage);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-12-04 21:23</div>
+</div>
+</body>
+</html>

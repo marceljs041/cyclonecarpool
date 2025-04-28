@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF">
+
+    <View
+        android:id="@+id/rectangle_3"
+        android:layout_width="match_parent"
+        android:layout_height="49dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:background="#C8102E"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/searchBarClosed"
+        android:layout_width="match_parent"
+        android:layout_height="18dp"
+        android:background="#F1BE48"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/rectangle_3" />
+
+    <LinearLayout
+        android:id="@+id/searchBarExpanded"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#F1BE48"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal"
+        android:padding="8dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/rectangle_3">
+
+        <EditText
+            android:id="@+id/fromSearchInput"
+            android:layout_width="120dp"
+            android:layout_height="25dp"
+            android:layout_marginEnd="6dp"
+            android:background="@drawable/btn_white_square"
+            android:fontFamily="@font/proximanova_extrabold"
+            android:hint="From..."
+            android:paddingLeft="8dp"
+            android:textColor="@color/black"
+            android:textColorHint="@color/black"
+            android:textSize="15sp" />
+
+        <EditText
+            android:id="@+id/toSearchInput"
+            android:layout_width="120dp"
+            android:layout_height="25dp"
+            android:layout_marginEnd="6dp"
+            android:background="@drawable/btn_white_square"
+            android:fontFamily="@font/proximanova_extrabold"
+            android:hint="To..."
+            android:paddingLeft="8dp"
+            android:textColor="@color/black"
+            android:textColorHint="@color/black"
+            android:textSize="15sp" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/searchBtn"
+            android:layout_width="78dp"
+            android:layout_height="25dp"
+            android:background="@drawable/btn_red_square"
+            android:fontFamily="@font/proximanova_extrabold"
+            android:text="Search"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/trips_near_"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="4dp"
+        android:fontFamily="@font/proximanova_extrabold"
+        android:lineHeight="39sp"
+        android:text="@string/trips_near_"
+        android:textAppearance="@style/trips_near_"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/searchBarToggle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="4dp"
+        app:layout_constraintBottom_toBottomOf="@+id/searchBarClosed"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <View
+            android:id="@+id/polygon_2"
+            android:layout_width="8dp"
+            android:layout_height="7dp"
+            android:background="@drawable/arrow_down" />
+
+        <TextView
+            android:id="@+id/search"
+            android:layout_width="33dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/proximanova_extrabold"
+            android:gravity="center"
+            android:text="@string/search"
+            android:textAppearance="@style/search" />
+
+        <View
+            android:id="@+id/polygon_3"
+            android:layout_width="8dp"
+            android:layout_height="7dp"
+            android:background="@drawable/arrow_down" />
+    </LinearLayout>
+
+    <View
+        android:id="@+id/rectangle_1"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:background="#C8102E"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/house_navBtn_h"
+        android:layout_width="36dp"
+        android:layout_height="32dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="35dp"
+        android:background="@drawable/icon_home_h"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/rectangle_1" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/trips_navBtn"
+        android:layout_width="36dp"
+        android:layout_height="32dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="23dp"
+        android:background="@drawable/icon_road"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/house_navBtn_h"
+        app:layout_constraintTop_toTopOf="@+id/rectangle_1" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/messages_navBtn"
+        android:layout_width="38dp"
+        android:layout_height="38dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginEnd="22dp"
+        android:background="@drawable/icon_mail"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/profileBtn"
+        app:layout_constraintTop_toTopOf="@+id/rectangle_1" />
+
+    <ImageView
+        android:id="@+id/plus_solid"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:translationZ="5dp"
+        app:layout_constraintBottom_toBottomOf="@+id/btnCreate"
+        app:layout_constraintEnd_toEndOf="@+id/btnCreate"
+        app:layout_constraintStart_toStartOf="@+id/btnCreate"
+        app:layout_constraintTop_toTopOf="@+id/btnCreate"
+        app:srcCompat="@drawable/icon_plus" />
+
+    <ImageView
+        android:id="@+id/profileBtn"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginEnd="35dp"
+        android:translationZ="5dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/rectangle_1"
+        app:srcCompat="@drawable/icon_plus" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnCreate"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginBottom="12dp"
+        android:background="@drawable/btn_yellow_circle"
+        android:elevation="4dp"
+        app:layout_constraintBottom_toBottomOf="@+id/rectangle_1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ScrollView
+        android:id="@+id/tripsScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="600dp"
+        android:layout_marginTop="19dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/searchBarClosed">
+
+        <LinearLayout
+            android:id="@+id/trip_Container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

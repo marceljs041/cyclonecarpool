@@ -1,0 +1,619 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF">
+
+<!--    Header    -->
+    <TextView
+        android:id="@+id/page_header"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:background="#C8102E"
+        android:fontFamily="@font/proximanova_extrabold"
+        android:text="@string/tripinfo_header"
+        android:gravity="center"
+        android:textAppearance="@style/trips_near_"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+<!--    Body    -->
+    <View
+        android:id="@+id/trip_card"
+        android:layout_width="290dp"
+        android:layout_height="123dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/bg_sq_white"
+        android:elevation="4dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/page_header" />
+
+    <TextView
+        android:id="@+id/tripText"
+        android:layout_width="wrap_content"
+        android:layout_height="19dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="9dp"
+        android:fontFamily="@font/proximanova_extrabold"
+        android:gravity="center"
+        android:text="@string/trip_route_p"
+        android:textAppearance="@style/iowa_state_"
+        android:translationZ="5dp"
+        app:layout_constraintEnd_toEndOf="@+id/trip_card"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="@+id/trip_card"
+        app:layout_constraintTop_toTopOf="@+id/trip_card" />
+
+    <View
+        android:id="@+id/line_1"
+        android:layout_width="265dp"
+        android:layout_height="1dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="2dp"
+        android:translationZ="5dp"
+        android:background="@drawable/thin_line"
+        app:layout_constraintEnd_toEndOf="@+id/trip_card"
+        app:layout_constraintStart_toStartOf="@+id/trip_card"
+        app:layout_constraintTop_toBottomOf="@+id/tripText" />
+
+    <TextView
+        android:id="@+id/am_cst"
+        android:layout_width="wrap_content"
+        android:layout_height="12dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="2dp"
+        android:fontFamily="@font/proximanova_bold"
+        android:gravity="top"
+        android:text="@string/trip_time_p"
+        android:textAppearance="@style/date_time"
+        android:translationZ="5dp"
+        app:layout_constraintStart_toStartOf="@+id/trip_card"
+        app:layout_constraintTop_toBottomOf="@+id/line_1" />
+
+    <View
+        android:id="@+id/location_dot"
+        android:layout_width="8.5dp"
+        android:layout_height="12dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="13dp"
+        android:layout_marginTop="13dp"
+        android:background="@drawable/icon_location"
+        android:translationZ="5dp"
+        app:layout_constraintStart_toStartOf="@+id/trip_card"
+        app:layout_constraintTop_toBottomOf="@+id/am_cst" />
+
+    <TextView
+        android:id="@+id/pick_up_tbd"
+        android:layout_width="wrap_content"
+        android:layout_height="12dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="3dp"
+        android:layout_marginTop="13dp"
+        android:fontFamily="@font/proximanova_bold"
+        android:gravity="start"
+        android:text="@string/trip_pickup_p"
+        android:textAppearance="@style/pick_up"
+        android:translationZ="5dp"
+        app:layout_constraintStart_toEndOf="@+id/location_dot"
+        app:layout_constraintTop_toBottomOf="@+id/am_cst" />
+
+    <View
+        android:id="@+id/car_seats"
+        android:layout_width="13dp"
+        android:layout_height="13dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="2dp"
+        android:background="@drawable/icon_car_solid"
+        android:translationZ="5dp"
+        app:layout_constraintStart_toStartOf="@+id/trip_card"
+        app:layout_constraintTop_toBottomOf="@+id/location_dot" />
+
+    <TextView
+        android:id="@+id/seats_avail"
+        android:layout_width="wrap_content"
+        android:layout_height="12dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="2dp"
+        android:fontFamily="@font/proximanova_bold"
+        android:gravity="start"
+        android:text="@string/trip_seats_p"
+        android:textAppearance="@style/seats_avail"
+        android:translationZ="5dp"
+        app:layout_constraintStart_toEndOf="@+id/car_seats"
+        app:layout_constraintTop_toBottomOf="@+id/pick_up_tbd" />
+
+    <View
+        android:id="@+id/price"
+        android:layout_width="49dp"
+        android:layout_height="19dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="3dp"
+        android:layout_marginEnd="12dp"
+        android:background="@drawable/btn_red_square"
+        android:translationZ="5dp"
+        app:layout_constraintEnd_toEndOf="@+id/trip_card"
+        app:layout_constraintTop_toBottomOf="@+id/line_1" />
+
+    <View
+        android:id="@+id/user"
+        android:layout_width="8dp"
+        android:layout_height="10dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginEnd="7dp"
+        android:background="@drawable/icon_user"
+        android:translationZ="5dp"
+        app:layout_constraintBottom_toBottomOf="@+id/price"
+        app:layout_constraintEnd_toEndOf="@+id/price"
+        app:layout_constraintTop_toTopOf="@+id/price" />
+
+    <TextView
+        android:id="@+id/priceText"
+        android:layout_width="wrap_content"
+        android:layout_height="10dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="7dp"
+        android:fontFamily="@font/proximanova_extrabold"
+        android:gravity="start"
+        android:text="@string/trip_price_p"
+        android:textAppearance="@style/price_style"
+        android:translationZ="5dp"
+        app:layout_constraintBottom_toBottomOf="@+id/price"
+        app:layout_constraintStart_toStartOf="@+id/price"
+        app:layout_constraintTop_toTopOf="@+id/price" />
+
+    <View
+        android:id="@+id/roundTrip"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="52dp"
+        android:background="@drawable/icon_round_trip"
+        android:translationZ="5dp"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="@+id/trip_card"
+        app:layout_constraintTop_toBottomOf="@+id/price" />
+
+    <TextView
+        android:id="@+id/round_trip"
+        android:visibility="invisible"
+        android:layout_width="wrap_content"
+        android:layout_height="10dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="5dp"
+        android:fontFamily="@font/proximanova_extrabold"
+        android:gravity="start"
+        android:text="@string/trip_roundtrip"
+        android:textAppearance="@style/trip_type"
+        android:translationZ="5dp"
+        app:layout_constraintStart_toEndOf="@+id/roundTrip"
+        app:layout_constraintTop_toBottomOf="@+id/price" />
+
+    <View
+        android:id="@+id/oneWay"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="53dp"
+        android:background="@drawable/icon_one_way"
+        android:translationZ="5dp"
+        app:layout_constraintEnd_toEndOf="@+id/trip_card"
+        app:layout_constraintTop_toBottomOf="@+id/price" />
+
+    <TextView
+        android:id="@+id/oneway_trip"
+        android:layout_width="wrap_content"
+        android:layout_height="10dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="5dp"
+        android:fontFamily="@font/proximanova_extrabold"
+        android:gravity="start"
+        android:text="@string/trip_oneway"
+        android:textAppearance="@style/trip_type"
+        android:translationZ="5dp"
+        app:layout_constraintStart_toEndOf="@+id/oneWay"
+        app:layout_constraintTop_toBottomOf="@+id/price" />
+
+    <View
+        android:id="@+id/noSmoke"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="3dp"
+        android:layout_marginEnd="52dp"
+        android:background="@drawable/icon_no_smoke"
+        android:translationZ="5dp"
+        app:layout_constraintEnd_toEndOf="@+id/trip_card"
+        app:layout_constraintTop_toBottomOf="@+id/roundTrip" />
+
+    <TextView
+        android:id="@+id/nosmoke_text"
+        android:layout_width="wrap_content"
+        android:layout_height="10dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="3dp"
+        android:fontFamily="@font/proximanova_extrabold"
+        android:gravity="start"
+        android:text="@string/trip_nosmoking"
+        android:textAppearance="@style/trip_type"
+        android:translationZ="5dp"
+        app:layout_constraintStart_toEndOf="@+id/noSmoke"
+        app:layout_constraintTop_toBottomOf="@+id/round_trip" />
+
+    <View
+        android:id="@+id/line_2"
+        android:layout_width="265dp"
+        android:layout_height="1dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/thin_line"
+        android:translationZ="5dp"
+        app:layout_constraintEnd_toEndOf="@id/trip_card"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="@id/trip_card"
+        app:layout_constraintTop_toBottomOf="@id/seats_avail" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnEdit"
+        android:layout_width="45dp"
+        android:layout_height="15dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/btn_red_square"
+        android:fontFamily="@font/proximanova_extrabold"
+        android:text="@string/trip_edit"
+        android:textColor="#FFFFFF"
+        android:textSize="12sp"
+        android:translationZ="5dp"
+        app:layout_constraintBottom_toBottomOf="@+id/trip_card"
+        app:layout_constraintEnd_toEndOf="@+id/trip_card"
+        app:layout_constraintStart_toStartOf="@+id/trip_card" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnDelete"
+        android:layout_width="60dp"
+        android:layout_height="15dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/btn_red_square"
+        android:fontFamily="@font/proximanova_extrabold"
+        android:text="@string/trip_delete"
+        android:textColor="#FFFFFF"
+        android:textSize="12sp"
+        android:translationZ="5dp"
+        app:layout_constraintBottom_toBottomOf="@+id/trip_card"
+        app:layout_constraintEnd_toEndOf="@+id/trip_card"
+        app:layout_constraintHorizontal_bias="0.102"
+        app:layout_constraintStart_toStartOf="@+id/trip_card" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/messageBtn"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/icon_paper_plane"
+        android:translationZ="5dp"
+        app:layout_constraintBottom_toBottomOf="@+id/trip_card"
+        app:layout_constraintEnd_toEndOf="@+id/trip_card" />
+
+    <!-- Driver -->
+    <TextView
+        android:id="@+id/driver_heading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Driver"
+        android:fontFamily="@font/proximanova_extrabold"
+        android:textAppearance="@style/iowa_state_"
+        android:layout_marginTop="30dp"
+        app:layout_constraintTop_toBottomOf="@id/trip_card"
+        app:layout_constraintStart_toStartOf="@id/driver_card"
+    />
+
+    <View
+        android:id="@+id/driver_card"
+        android:layout_width="290dp"
+        android:layout_height="50dp"
+        android:background="@drawable/bg_sq_white"
+        app:layout_constraintTop_toBottomOf="@id/driver_heading"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+    />
+
+    <ImageView
+        android:id="@+id/driver_image"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="11dp"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/circle_outline"
+        android:elevation="4dp"
+        android:translationZ="5dp"
+        app:layout_constraintStart_toStartOf="@id/driver_card"
+        app:layout_constraintTop_toTopOf="@+id/driver_card"
+        app:layout_constraintBottom_toBottomOf="@id/driver_card"
+    />
+
+    <TextView
+        android:id="@+id/driver_name"
+        android:layout_width="79dp"
+        android:layout_height="18dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:fontFamily="@font/proximanova_extrabold"
+        android:text="@string/chat_name"
+        android:textAppearance="@style/chat_name"
+        android:translationZ="5dp"
+        android:layout_marginStart="8dp"
+        app:layout_constraintStart_toEndOf="@id/driver_image"
+        app:layout_constraintTop_toTopOf="@id/driver_card"
+        app:layout_constraintBottom_toBottomOf="@id/driver_card"
+        />
+
+    <View
+        android:id="@+id/driver_rating"
+        android:layout_width="49dp"
+        android:layout_height="19dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginEnd="12dp"
+        android:background="@drawable/btn_red_square"
+        android:translationZ="5dp"
+        app:layout_constraintEnd_toEndOf="@+id/driver_card"
+        app:layout_constraintTop_toTopOf="@id/driver_card"
+        app:layout_constraintBottom_toBottomOf="@id/driver_card"
+        />
+
+    <View
+        android:id="@+id/driver_stars"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginEnd="6dp"
+        android:background="@drawable/icon_star"
+        android:backgroundTint="#FFFFFF"
+        android:translationZ="5dp"
+        app:layout_constraintBottom_toBottomOf="@+id/driver_rating"
+        app:layout_constraintEnd_toEndOf="@+id/driver_rating"
+        app:layout_constraintTop_toTopOf="@+id/driver_rating" />
+
+    <TextView
+        android:id="@+id/driver_rating_text"
+        android:layout_width="wrap_content"
+        android:layout_height="10dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="7dp"
+        android:fontFamily="@font/proximanova_extrabold"
+        android:gravity="start"
+        android:text="0.0"
+        android:textAppearance="@style/price_style"
+        android:translationZ="5dp"
+        app:layout_constraintBottom_toBottomOf="@+id/driver_rating"
+        app:layout_constraintStart_toStartOf="@+id/driver_rating"
+        app:layout_constraintTop_toTopOf="@+id/driver_rating" />
+
+    <!-- Passengers -->
+    <TextView
+        android:id="@+id/passengers_heading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/trip_passengers_heading"
+        android:fontFamily="@font/proximanova_extrabold"
+        android:textAppearance="@style/iowa_state_"
+        android:layout_marginTop="20dp"
+        app:layout_constraintTop_toBottomOf="@id/driver_card"
+        app:layout_constraintStart_toStartOf="@id/driver_card"
+        />
+
+    <ScrollView
+        android:id="@+id/passengerScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/passengers_heading">
+
+        <LinearLayout
+            android:id="@+id/passenger_Container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+    </ScrollView>
+
+    <LinearLayout
+        android:id="@+id/trip_buttons"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/passengerScrollView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+    >
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_trip_join"
+            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:paddingHorizontal="16dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/btn_gray_square"
+            android:fontFamily="@font/proximanova_extrabold"
+            android:text="Ask to Join"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_trip_track"
+            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:paddingHorizontal="16dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/btn_gray_square"
+            android:fontFamily="@font/proximanova_extrabold"
+            android:text="View Route"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_trip_review"
+            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:paddingHorizontal="16dp"
+            android:background="@drawable/btn_gray_square"
+            android:fontFamily="@font/proximanova_extrabold"
+            android:text="Rate Driver"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/pending_requests_container"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:layout_marginTop="4dp"
+        android:orientation="vertical"
+        android:paddingTop="4sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/pendingPassengers" />
+
+
+    <!--    Footer    -->
+    <View
+        android:id="@+id/navbar"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:background="#C8102E"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/house_navBtn"
+        android:layout_width="36dp"
+        android:layout_height="32dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="35dp"
+        android:background="@drawable/icon_home_h"
+        android:backgroundTint="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/navbar" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/trips_navBtn"
+        android:layout_width="36dp"
+        android:layout_height="32dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="23dp"
+        android:background="@drawable/icon_road"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/house_navBtn"
+        app:layout_constraintTop_toTopOf="@id/navbar" />
+    <!--android:backgroundTint="#F1BE48"-->
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/messages_navBtn"
+        android:layout_width="38dp"
+        android:layout_height="38dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginEnd="22dp"
+        android:background="@drawable/icon_mail"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/profileBtn"
+        app:layout_constraintTop_toTopOf="@id/navbar" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnCreate"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginBottom="12dp"
+        android:background="@drawable/btn_yellow_circle"
+        android:elevation="4dp"
+        app:layout_constraintBottom_toBottomOf="@id/navbar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/plus_solid"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:translationZ="5dp"
+        app:layout_constraintBottom_toBottomOf="@id/btnCreate"
+        app:layout_constraintEnd_toEndOf="@id/btnCreate"
+        app:layout_constraintStart_toStartOf="@id/btnCreate"
+        app:layout_constraintTop_toTopOf="@id/btnCreate"
+        app:srcCompat="@drawable/icon_plus" />
+
+    <ImageView
+        android:id="@+id/profileBtn"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginEnd="35dp"
+        android:translationZ="5dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/navbar"
+        app:srcCompat="@drawable/icon_plus" />
+
+    <TextView
+        android:id="@+id/pendingPassengers"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:fontFamily="@font/proximanova_extrabold"
+        android:textAppearance="@style/pendingPass"
+        android:text="Pending Passengers"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/trip_buttons" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

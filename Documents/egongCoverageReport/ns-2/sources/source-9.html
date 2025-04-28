@@ -1,0 +1,223 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RouteService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">cycloneCarpool.LocationTracking</a>
+</div>
+
+<h1>Coverage Summary for Class: RouteService (cycloneCarpool.LocationTracking)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RouteService</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    25%
+  </span>
+  <span class="absValue">
+    (1/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    6.1%
+  </span>
+  <span class="absValue">
+    (3/49)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package cycloneCarpool.LocationTracking;
+&nbsp;
+&nbsp;import com.fasterxml.jackson.databind.JsonNode;
+&nbsp;import com.fasterxml.jackson.databind.ObjectMapper;
+&nbsp;import org.springframework.beans.factory.annotation.Value;
+&nbsp;import org.springframework.http.HttpStatus;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;import org.springframework.web.client.RestTemplate;
+&nbsp;import org.springframework.web.server.ResponseStatusException;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;@Service
+<b class="fc">&nbsp;public class RouteService {</b>
+&nbsp;
+&nbsp;    @Value(&quot;${mapbox.api.key}&quot;)
+&nbsp;    private String apiKey;
+&nbsp;
+<b class="fc">&nbsp;    private final RestTemplate restTemplate = new RestTemplate();</b>
+<b class="fc">&nbsp;    private final ObjectMapper objectMapper = new ObjectMapper();</b>
+&nbsp;
+&nbsp;    public RouteResponseDTO getOptimalRoute(String startCoordinates, String endCoordinates) {
+&nbsp;        try {
+&nbsp;            // Validate and parse coordinates as latitude,longitude
+<b class="nc">&nbsp;            double[] start = parseCoordinates(startCoordinates);</b>
+<b class="nc">&nbsp;            double[] end = parseCoordinates(endCoordinates);</b>
+&nbsp;
+&nbsp;            // Mapbox expects longitude,latitude, so swap them
+<b class="nc">&nbsp;            String formattedStart = start[1] + &quot;,&quot; + start[0];</b>
+<b class="nc">&nbsp;            String formattedEnd = end[1] + &quot;,&quot; + end[0];</b>
+&nbsp;
+<b class="nc">&nbsp;            String profile = &quot;mapbox/driving&quot;;</b>
+<b class="nc">&nbsp;            String url = String.format(&quot;https://api.mapbox.com/directions/v5/%s/%s;%s?geometries=geojson&amp;access_token=%s&quot;,</b>
+&nbsp;                    profile, formattedStart, formattedEnd, apiKey);
+&nbsp;
+<b class="nc">&nbsp;            String response = restTemplate.getForObject(url, String.class);</b>
+<b class="nc">&nbsp;            JsonNode rootNode = objectMapper.readTree(response);</b>
+<b class="nc">&nbsp;            JsonNode routeNode = rootNode.path(&quot;routes&quot;).get(0);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (routeNode.isNull()) {</b>
+<b class="nc">&nbsp;                throw new ResponseStatusException(HttpStatus.NOT_FOUND, &quot;No route found for the given coordinates.&quot;);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // Extract details for the response DTO
+<b class="nc">&nbsp;            RouteResponseDTO routeResponse = new RouteResponseDTO();</b>
+<b class="nc">&nbsp;            routeResponse.setDuration(routeNode.path(&quot;duration&quot;).asDouble() / 60);</b>
+<b class="nc">&nbsp;            routeResponse.setDistance(routeNode.path(&quot;distance&quot;).asDouble() / 1609.34);</b>
+<b class="nc">&nbsp;            routeResponse.setSummary(routeNode.path(&quot;legs&quot;).get(0).path(&quot;summary&quot;).asText());</b>
+&nbsp;
+&nbsp;            // Extract geometry coordinates
+<b class="nc">&nbsp;            List&lt;double[]&gt; coordinates = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;            for (JsonNode coord : routeNode.path(&quot;geometry&quot;).path(&quot;coordinates&quot;)) {</b>
+<b class="nc">&nbsp;                double[] point = {coord.get(1).asDouble(), coord.get(0).asDouble()};</b>
+<b class="nc">&nbsp;                coordinates.add(point);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            routeResponse.setGeometry(coordinates);</b>
+&nbsp;
+<b class="nc">&nbsp;            return routeResponse;</b>
+<b class="nc">&nbsp;        } catch (ResponseStatusException e) {</b>
+<b class="nc">&nbsp;            throw e;</b>
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, &quot;An error occurred while processing the route.&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private double[] parseCoordinates(String coordinates) {
+&nbsp;        try {
+<b class="nc">&nbsp;            String[] parts = coordinates.split(&quot;,&quot;);</b>
+<b class="nc">&nbsp;            if (parts.length != 2) throw new IllegalArgumentException(&quot;Invalid coordinates format&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;            double latitude = Double.parseDouble(parts[0]);</b>
+<b class="nc">&nbsp;            double longitude = Double.parseDouble(parts[1]);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (latitude &lt; -90 || latitude &gt; 90 || longitude &lt; -180 || longitude &gt; 180) {</b>
+<b class="nc">&nbsp;                throw new IllegalArgumentException(&quot;Coordinates out of range&quot;);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            return new double[]{latitude, longitude};</b>
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, &quot;Invalid coordinates provided. Coordinates must be in the format (latitude,longitude) and within valid ranges.&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public double[] getCoordinatesFromPlaceName(String placeName) {
+&nbsp;        try {
+<b class="nc">&nbsp;            String url = String.format(&quot;https://api.mapbox.com/geocoding/v5/mapbox.places/%s.json?access_token=%s&amp;limit=1&quot;,</b>
+&nbsp;                    placeName, apiKey);
+&nbsp;
+<b class="nc">&nbsp;            String response = restTemplate.getForObject(url, String.class);</b>
+<b class="nc">&nbsp;            JsonNode rootNode = objectMapper.readTree(response);</b>
+<b class="nc">&nbsp;            JsonNode featuresNode = rootNode.path(&quot;features&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (featuresNode.isArray() &amp;&amp; featuresNode.size() &gt; 0) {</b>
+<b class="nc">&nbsp;                JsonNode coordinates = featuresNode.get(0).path(&quot;geometry&quot;).path(&quot;coordinates&quot;);</b>
+<b class="nc">&nbsp;                double longitude = coordinates.get(0).asDouble();</b>
+<b class="nc">&nbsp;                double latitude = coordinates.get(1).asDouble();</b>
+<b class="nc">&nbsp;                return new double[]{latitude, longitude};</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                throw new ResponseStatusException(HttpStatus.NOT_FOUND, &quot;No coordinates found for the given place name.&quot;);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, &quot;Error fetching coordinates.&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-12-04 21:23</div>
+</div>
+</body>
+</html>

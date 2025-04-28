@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Heading" parent="TextAppearance.AppCompat.Headline">
+        <item name="android:fontFamily">serif</item>
+    </style>
+    <style name="Label" parent="TextAppearance.AppCompat.Caption">
+        <item name="android:fontStyle"></item>
+    </style>
+</resources>

@@ -1,0 +1,159 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PaymentController</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">cycloneCarpool.Payments</a>
+</div>
+
+<h1>Coverage Summary for Class: PaymentController (cycloneCarpool.Payments)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PaymentController</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    20%
+  </span>
+  <span class="absValue">
+    (1/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    11.1%
+  </span>
+  <span class="absValue">
+    (1/9)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package cycloneCarpool.Payments;
+&nbsp;
+&nbsp;import io.swagger.v3.oas.annotations.Operation;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.http.ResponseEntity;
+&nbsp;import org.springframework.web.bind.annotation.*;
+&nbsp;
+&nbsp;/**
+&nbsp; * @author Anthony Campana
+&nbsp; */
+&nbsp;
+&nbsp;@RestController
+&nbsp;@RequestMapping(&quot;/payments&quot;)
+<b class="fc">&nbsp;public class PaymentController {</b>
+&nbsp;
+&nbsp;    @Autowired
+&nbsp;    private PaymentService paymentService;
+&nbsp;
+&nbsp;    @Operation(summary = &quot;Initates a Payment request to a specific passenger.&quot;, description = &quot;Requests a payment from the passenger for a specific trip (tripId) for a predetermined amount. &quot; +
+&nbsp;            &quot;Sets payment status to pending.&quot;)
+&nbsp;    @PostMapping(&quot;/initiate&quot;)
+&nbsp;    public PaymentResponseDTO initiatePayment(@RequestParam Double amount, @RequestParam Long tripId, @RequestParam Long passengerId) {
+<b class="nc">&nbsp;        Payment payment = paymentService.initiatePayment(amount, tripId, passengerId);</b>
+<b class="nc">&nbsp;        return new PaymentResponseDTO(payment);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Operation(summary = &quot;Marks Payment Status as Complete&quot;, description = &quot;If a payment is successful then updates the current paymentID status to complete.&quot;)
+&nbsp;    @PostMapping(&quot;/complete/{paymentId}&quot;)
+&nbsp;    public Payment completePayment(@PathVariable Long paymentId) {
+<b class="nc">&nbsp;        return paymentService.completePayment(paymentId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Operation(summary = &quot;Marks payment status as Failed&quot;, description = &quot;If a payment is unsuccessful then updates the current paymentID status to failed.&quot;)
+&nbsp;    @PostMapping(&quot;/fail/{paymentId}&quot;)
+&nbsp;    public Payment failPayment(@PathVariable Long paymentId) {
+<b class="nc">&nbsp;        return paymentService.failPayment(paymentId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Operation(summary = &quot;Process Payment with STRIPE API&quot;, description = &quot;Uses Stripe API to process a payment. If successful then method will return a receipt in a JSON object. &quot; +
+&nbsp;            &quot;Otherwise will return a response failed message.&quot;)
+&nbsp;    @PostMapping(&quot;/process&quot;)
+&nbsp;    public ResponseEntity&lt;String&gt; processPayment(
+&nbsp;            @RequestParam Long passengerId,
+&nbsp;            @RequestParam Long tripId,
+&nbsp;            @RequestParam Double amount,
+&nbsp;            @RequestParam String paymentMethod) {
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            Payment payment = paymentService.processPayment(passengerId, tripId, amount, paymentMethod);</b>
+<b class="nc">&nbsp;            return ResponseEntity.ok(&quot;Payment processed successfully. Receipt URL: &quot; + payment.getReceiptUrl());</b>
+<b class="nc">&nbsp;        } catch (RuntimeException e) {</b>
+<b class="nc">&nbsp;            return ResponseEntity.badRequest().body(&quot;Payment failed: &quot; + e.getMessage());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-12-04 21:23</div>
+</div>
+</body>
+</html>

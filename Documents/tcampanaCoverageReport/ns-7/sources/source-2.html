@@ -1,0 +1,215 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PassengerTripStatusController</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">cycloneCarpool.Trips</a>
+</div>
+
+<h1>Coverage Summary for Class: PassengerTripStatusController (cycloneCarpool.Trips)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PassengerTripStatusController</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    14.3%
+  </span>
+  <span class="absValue">
+    (1/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    3.6%
+  </span>
+  <span class="absValue">
+    (1/28)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package cycloneCarpool.Trips;
+&nbsp;
+&nbsp;import cycloneCarpool.Notification.NotificationService;
+&nbsp;import io.swagger.v3.oas.annotations.Operation;
+&nbsp;import io.swagger.v3.oas.annotations.tags.Tag;
+&nbsp;import jakarta.persistence.EntityNotFoundException;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.http.HttpStatus;
+&nbsp;import org.springframework.http.ResponseEntity;
+&nbsp;import org.springframework.web.bind.annotation.*;
+&nbsp;
+&nbsp;/**
+&nbsp; * @author Anthony Campana
+&nbsp; */
+&nbsp;
+&nbsp;@Tag(name = &quot;PassengerTripStatus(PTS) Controller&quot;, description = &quot;Operations related to the status of passenger and trip&quot;)
+&nbsp;@RestController
+&nbsp;@RequestMapping(&quot;/passenger-trip-status&quot;)
+<b class="fc">&nbsp;public class PassengerTripStatusController {</b>
+&nbsp;
+&nbsp;    @Autowired
+&nbsp;    private PassengerTripStatusService passengerTripStatusService;
+&nbsp;
+&nbsp;    @Autowired
+&nbsp;    private NotificationService notificationService;
+&nbsp;    @Autowired
+&nbsp;    private TripService tripService;
+&nbsp;
+&nbsp;    @Operation(summary = &quot;Get single PTS info by passenger id and trip id&quot;, description = &quot;Get PTS info from database for a single PTS by the given trip&#39;s id and passenger&#39;s id.&quot;)
+&nbsp;    @GetMapping(&quot;/status/{tripId}/{passengerId}&quot;)
+&nbsp;    public ResponseEntity&lt;PassengerTripStatus&gt; getPassengerTripStatus(@PathVariable Long tripId, @PathVariable Long passengerId) {
+&nbsp;        try {
+<b class="nc">&nbsp;            PassengerTripStatus pts = passengerTripStatusService.getPassengerTripStatus(tripId, passengerId);</b>
+<b class="nc">&nbsp;            return ResponseEntity.ok(pts);</b>
+<b class="nc">&nbsp;        } catch (IllegalArgumentException e) {</b>
+<b class="nc">&nbsp;            return ResponseEntity.notFound().build();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Operation(summary = &quot;Initialize a new PTS&quot;, description = &quot;Initialize a new PTS for passenger with given user id for a trip with given trip id, if applicable;&quot; +
+&nbsp;            &quot;status is default to PENDING and payment is default to false.&quot;)
+&nbsp;    @PostMapping(&quot;/status/{tripId}/{passengerId}&quot;)
+&nbsp;    public ResponseEntity&lt;String&gt; createPassengerStatus(@PathVariable Long tripId, @PathVariable Long passengerId) {
+&nbsp;        try {
+<b class="nc">&nbsp;            PassengerTripStatus ptsCreated = passengerTripStatusService.createPassengerStatus(tripId, passengerId);</b>
+<b class="nc">&nbsp;            return ResponseEntity.ok(&quot;pts created: &quot; +  ptsCreated.getId());</b>
+<b class="nc">&nbsp;        } catch (EntityNotFoundException e) {</b>
+<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());</b>
+<b class="nc">&nbsp;        } catch (IllegalStateException e) {</b>
+<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    @Operation(summary = &quot;Get single PTS id by passenger id and trip id&quot;, description = &quot;Get PTS id from database for a single PTS by the given trip&#39;s id and passenger&#39;s id.&quot;)
+&nbsp;    @GetMapping(&quot;/status/id/{tripId}/{passengerId}&quot;)
+&nbsp;    public ResponseEntity&lt;String&gt; getPTSId(@PathVariable Long tripId, @PathVariable Long passengerId) {
+&nbsp;        try {
+<b class="nc">&nbsp;            Long ptsId = passengerTripStatusService.getPTSid(tripId, passengerId);</b>
+<b class="nc">&nbsp;            return ResponseEntity.ok(String.valueOf(ptsId));</b>
+<b class="nc">&nbsp;        } catch (RuntimeException e){</b>
+<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Operation(summary = &quot;Update PTS status by passenger id and trip id&quot;, description = &quot;Update PTS status in the database by the given trip&#39;s id and passenger&#39;s id with the provided status.&quot;)
+&nbsp;    @PostMapping(&quot;/update-status&quot;)
+&nbsp;    public ResponseEntity&lt;String&gt; updatePassengerStatus(@RequestParam Long tripId, @RequestParam Long passengerId, @RequestParam String status) {
+&nbsp;        try {
+<b class="nc">&nbsp;            passengerTripStatusService.updateStatus(tripId, passengerId, status);</b>
+<b class="nc">&nbsp;            return ResponseEntity.ok(&quot;Passenger status updated successfully.&quot;);</b>
+<b class="nc">&nbsp;        } catch (IllegalArgumentException | EntityNotFoundException e) {</b>
+<b class="nc">&nbsp;            return ResponseEntity.badRequest().body(e.getMessage());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Operation(summary = &quot;Update PTS payment status by passenger id and trip id&quot;, description = &quot;Update PTS payment status in the database by the given trip&#39;s id and passenger&#39;s id with the provided payment status.&quot;)
+&nbsp;    @PostMapping(&quot;/update-payment&quot;)
+&nbsp;    public ResponseEntity&lt;String&gt; updatePaymentStatus(@RequestParam Long tripId, @RequestParam Long passengerId, @RequestParam boolean paid) {
+&nbsp;        try {
+<b class="nc">&nbsp;            passengerTripStatusService.updatePaymentStatus(tripId, passengerId, paid);</b>
+<b class="nc">&nbsp;            return ResponseEntity.ok(&quot;Payment status updated successfully.&quot;);</b>
+<b class="nc">&nbsp;        } catch (IllegalArgumentException e) {</b>
+<b class="nc">&nbsp;            return ResponseEntity.badRequest().body(e.getMessage());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Operation(summary = &quot;Get single PTS payment status by passenger id and trip id&quot;, description = &quot;Get PTS payment status from database for a single PTS by the given trip&#39;s id and passenger&#39;s id.&quot;)
+&nbsp;    @GetMapping(&quot;/paymentStatus/{tripId}/{passengerId}&quot;)
+&nbsp;    public ResponseEntity&lt;String&gt; getPaymentStatus(@PathVariable Long tripId, @PathVariable Long passengerId) {
+&nbsp;        try {
+<b class="nc">&nbsp;            boolean isPaid = passengerTripStatusService.getPaymentStatus(tripId, passengerId);</b>
+<b class="nc">&nbsp;            String statusMessage = isPaid ? &quot;Payment completed&quot; : &quot;Payment pending&quot;;</b>
+<b class="nc">&nbsp;            return ResponseEntity.ok(&quot;Payment status for trip ID &quot; + tripId + &quot; and passenger ID &quot; + passengerId + &quot;: &quot; + statusMessage);</b>
+<b class="nc">&nbsp;        } catch (RuntimeException e) {</b>
+<b class="nc">&nbsp;            return ResponseEntity.badRequest().body(e.getMessage());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-12-04 23:48</div>
+</div>
+</body>
+</html>

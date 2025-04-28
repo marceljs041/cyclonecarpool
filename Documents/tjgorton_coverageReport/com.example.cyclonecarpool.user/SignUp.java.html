@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SignUp.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debug</a> &gt; <a href="index.source.html" class="el_package">com.example.cyclonecarpool.user</a> &gt; <span class="el_source">SignUp.java</span></div><h1>SignUp.java</h1><pre class="source lang-java linenums">package com.example.cyclonecarpool.user;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Intent;
+import android.graphics.Color;
+import android.os.Bundle;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.ArrayAdapter;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.example.cyclonecarpool.R;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+<span class="nc" id="L37">public class SignUp extends AppCompatActivity implements View.OnClickListener{</span>
+
+    private Button confirmSignUpBtn;
+    private Spinner roleSpinner;
+    private JSONArray emailsArray;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+<span class="nc" id="L45">        super.onCreate(savedInstanceState);</span>
+
+<span class="nc" id="L47">        requestWindowFeature(Window.FEATURE_NO_TITLE);</span>
+<span class="nc" id="L48">        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);</span>
+<span class="nc" id="L49">        getSupportActionBar().hide();</span>
+
+<span class="nc" id="L51">        setContentView(R.layout.signup_screen);</span>
+
+<span class="nc" id="L53">        makeEmailListReq();</span>
+
+        // Modify the Spinner setup
+<span class="nc" id="L56">        roleSpinner = findViewById(R.id.roleSpinner);</span>
+
+        // Create a list of options with a placeholder
+<span class="nc" id="L59">        List&lt;String&gt; roleOptions = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L60">        roleOptions.add(&quot;Click for dropdown&quot;); // Placeholder</span>
+<span class="nc" id="L61">        roleOptions.addAll(Arrays.asList(getResources().getStringArray(R.array.role_options))); // Actual roles</span>
+
+<span class="nc" id="L63">        ArrayAdapter&lt;String&gt; adapter = new ArrayAdapter&lt;String&gt;(this, R.layout.spinner_item, roleOptions) {</span>
+            @Override
+            public boolean isEnabled(int position) {
+                // Disable the first item (placeholder) so it cannot be selected
+<span class="nc bnc" id="L67" title="All 2 branches missed.">                return position != 0;</span>
+            }
+
+            @Override
+            public View getDropDownView(int position, View convertView, ViewGroup parent) {
+<span class="nc" id="L72">                View view = super.getDropDownView(position, convertView, parent);</span>
+<span class="nc" id="L73">                TextView textView = (TextView) view;</span>
+                // Gray out the placeholder text
+<span class="nc bnc" id="L75" title="All 2 branches missed.">                if (position == 0) {</span>
+<span class="nc" id="L76">                    textView.setTextColor(Color.GRAY);</span>
+                } else {
+<span class="nc" id="L78">                    textView.setTextColor(Color.WHITE);</span>
+                }
+<span class="nc" id="L80">                return view;</span>
+            }
+        };
+
+<span class="nc" id="L84">        adapter.setDropDownViewResource(R.layout.spinner_item_dropdown);</span>
+<span class="nc" id="L85">        roleSpinner.setAdapter(adapter);</span>
+<span class="nc" id="L86">        roleSpinner.setSelection(0); // Set the placeholder as the default selection</span>
+
+<span class="nc" id="L88">        confirmSignUpBtn = findViewById(R.id.btnConfirmSignUp);</span>
+<span class="nc" id="L89">        confirmSignUpBtn.setOnClickListener(this);</span>
+<span class="nc" id="L90">    }</span>
+
+
+    @Override
+    public void onClick(View v) {
+<span class="nc" id="L95">        int id = v.getId();</span>
+<span class="nc bnc" id="L96" title="All 2 branches missed.">        if (id == R.id.btnConfirmSignUp) {</span>
+<span class="nc" id="L97">            EditText passwordInput = findViewById(R.id.password1Input);</span>
+<span class="nc" id="L98">            EditText passwordConfirmInput = findViewById(R.id.password2Input);</span>
+<span class="nc" id="L99">            String password = passwordInput.getText().toString();</span>
+<span class="nc" id="L100">            String passwordConfirm = passwordConfirmInput.getText().toString();</span>
+
+<span class="nc bnc" id="L102" title="All 2 branches missed.">            if (password.equals(passwordConfirm)) {</span>
+<span class="nc" id="L103">                EditText emailInput = findViewById(R.id.emailInput);</span>
+<span class="nc" id="L104">                String email = emailInput.getText().toString();</span>
+
+<span class="nc bnc" id="L106" title="All 2 branches missed.">                if (emailsArray != null) {</span>
+<span class="nc" id="L107">                    boolean emailExists = false;</span>
+                    try {
+<span class="nc bnc" id="L109" title="All 2 branches missed.">                        for (int i = 0; i &lt; emailsArray.length(); i++) {</span>
+<span class="nc" id="L110">                            String emailList = emailsArray.getString(i);</span>
+<span class="nc bnc" id="L111" title="All 2 branches missed.">                            if (email.equals(emailList)) {</span>
+<span class="nc" id="L112">                                emailExists = true;</span>
+<span class="nc" id="L113">                                break;</span>
+                            }
+                        }
+<span class="nc" id="L116">                    } catch (JSONException e) {</span>
+<span class="nc" id="L117">                        e.printStackTrace();</span>
+<span class="nc" id="L118">                    }</span>
+
+<span class="nc bnc" id="L120" title="All 2 branches missed.">                    if (emailExists) {</span>
+<span class="nc" id="L121">                        AlertDialog.Builder dlgAlert = new AlertDialog.Builder(this);</span>
+<span class="nc" id="L122">                        dlgAlert.setMessage(&quot;There is already an account associated with this email!&quot;);</span>
+<span class="nc" id="L123">                        dlgAlert.setTitle(&quot;Error Message...&quot;);</span>
+<span class="nc" id="L124">                        dlgAlert.setPositiveButton(&quot;OK&quot;, null);</span>
+<span class="nc" id="L125">                        dlgAlert.setCancelable(true);</span>
+<span class="nc" id="L126">                        dlgAlert.create().show();</span>
+<span class="nc" id="L127">                    } else {</span>
+<span class="nc" id="L128">                        EditText firstNameInput = findViewById(R.id.firstNameInput);</span>
+<span class="nc" id="L129">                        EditText lastNameInput = findViewById(R.id.lastNameInput);</span>
+<span class="nc" id="L130">                        Spinner spinnerInput = findViewById(R.id.roleSpinner);</span>
+
+<span class="nc" id="L132">                        String firstName = firstNameInput.getText().toString();</span>
+<span class="nc" id="L133">                        String lastName = lastNameInput.getText().toString();</span>
+<span class="nc" id="L134">                        String spinnerValue = spinnerInput.getSelectedItem().toString();</span>
+
+                        // Validate the spinner selection
+<span class="nc bnc" id="L137" title="All 2 branches missed.">                        if (spinnerValue.equals(&quot;Click for dropdown&quot;)) {</span>
+                            // Show error if no valid role is selected
+<span class="nc" id="L139">                            AlertDialog.Builder dlgAlert = new AlertDialog.Builder(this);</span>
+<span class="nc" id="L140">                            dlgAlert.setMessage(&quot;Please select a valid role from the dropdown.&quot;);</span>
+<span class="nc" id="L141">                            dlgAlert.setTitle(&quot;Error Message...&quot;);</span>
+<span class="nc" id="L142">                            dlgAlert.setPositiveButton(&quot;OK&quot;, null);</span>
+<span class="nc" id="L143">                            dlgAlert.setCancelable(true);</span>
+<span class="nc" id="L144">                            dlgAlert.create().show();</span>
+<span class="nc" id="L145">                        } else {</span>
+                            // Proceed with account creation
+<span class="nc" id="L147">                            createAccount(firstName, lastName, email, password, spinnerValue, &quot;https://firebasestorage.googleapis.com/v0/b/cyclonecarpool.appspot.com/o/placeholderprofilepic.png?alt=media&amp;token=1e53480d-f70e-4be3-8e73-03c5c8fe4b3d&quot;);</span>
+<span class="nc" id="L148">                            makeEmailListReq();</span>
+                        }
+                    }
+<span class="nc" id="L151">                } else {</span>
+<span class="nc" id="L152">                    AlertDialog.Builder dlgAlert = new AlertDialog.Builder(this);</span>
+<span class="nc" id="L153">                    dlgAlert.setMessage(&quot;Unable to retrieve email list. Please try again!&quot;);</span>
+<span class="nc" id="L154">                    dlgAlert.setTitle(&quot;Error Message...&quot;);</span>
+<span class="nc" id="L155">                    dlgAlert.setPositiveButton(&quot;OK&quot;, null);</span>
+<span class="nc" id="L156">                    dlgAlert.setCancelable(true);</span>
+<span class="nc" id="L157">                    dlgAlert.create().show();</span>
+                }
+<span class="nc" id="L159">            } else {</span>
+<span class="nc" id="L160">                AlertDialog.Builder dlgAlert = new AlertDialog.Builder(this);</span>
+<span class="nc" id="L161">                dlgAlert.setMessage(&quot;The passwords do not match!&quot;);</span>
+<span class="nc" id="L162">                dlgAlert.setTitle(&quot;Error Message...&quot;);</span>
+<span class="nc" id="L163">                dlgAlert.setPositiveButton(&quot;OK&quot;, null);</span>
+<span class="nc" id="L164">                dlgAlert.setCancelable(true);</span>
+<span class="nc" id="L165">                dlgAlert.create().show();</span>
+            }
+        }
+<span class="nc" id="L168">    }</span>
+
+    public void makeEmailListReq() {
+<span class="nc" id="L171">        new Thread(new Runnable() {</span>
+            @Override
+            public void run() {
+                try {
+<span class="nc" id="L175">                    URL url = new URL(&quot;http://coms-3090-029.class.las.iastate.edu:8080/api/users/emails&quot;);</span>
+<span class="nc" id="L176">                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();</span>
+<span class="nc" id="L177">                    connection.setRequestMethod(&quot;GET&quot;);</span>
+<span class="nc" id="L178">                    connection.setConnectTimeout(5000);</span>
+<span class="nc" id="L179">                    connection.setReadTimeout(5000);</span>
+<span class="nc" id="L180">                    connection.connect();</span>
+
+<span class="nc" id="L182">                    int responseCode = connection.getResponseCode();</span>
+<span class="nc bnc" id="L183" title="All 2 branches missed.">                    if (responseCode == HttpURLConnection.HTTP_OK) {</span>
+<span class="nc" id="L184">                        InputStream inputStream = connection.getInputStream();</span>
+<span class="nc" id="L185">                        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));</span>
+<span class="nc" id="L186">                        StringBuilder response = new StringBuilder();</span>
+                        String line;
+<span class="nc bnc" id="L188" title="All 2 branches missed.">                        while ((line = reader.readLine()) != null) {</span>
+<span class="nc" id="L189">                            response.append(line);</span>
+                        }
+<span class="nc" id="L191">                        reader.close();</span>
+
+
+<span class="nc" id="L194">                        emailsArray = new JSONArray(response.toString());</span>
+<span class="nc" id="L195">                        System.out.println(emailsArray);</span>
+
+<span class="nc" id="L197">                    } else {</span>
+<span class="nc" id="L198">                        System.out.println(&quot;Error: &quot; + responseCode);</span>
+                    }
+
+<span class="nc" id="L201">                } catch (IOException | JSONException e) {</span>
+<span class="nc" id="L202">                    e.printStackTrace();</span>
+<span class="nc" id="L203">                }</span>
+<span class="nc" id="L204">            }</span>
+<span class="nc" id="L205">        }).start();</span>
+<span class="nc" id="L206">    }</span>
+
+
+    public void createAccount(final String firstName, final String lastName, final String email, final String password, final String role, final String profileUrl) {
+<span class="nc" id="L210">        new Thread(new Runnable() {</span>
+            @Override
+            public void run() {
+                try {
+<span class="nc" id="L214">                    URL url = new URL(&quot;http://coms-3090-029.class.las.iastate.edu:8080/api/users/signup&quot;);</span>
+<span class="nc" id="L215">                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();</span>
+<span class="nc" id="L216">                    connection.setRequestMethod(&quot;POST&quot;);</span>
+<span class="nc" id="L217">                    connection.setRequestProperty(&quot;Content-Type&quot;, &quot;application/json; utf-8&quot;);</span>
+<span class="nc" id="L218">                    connection.setRequestProperty(&quot;Accept&quot;, &quot;application/json&quot;);</span>
+<span class="nc" id="L219">                    connection.setDoOutput(true);</span>
+
+                    // Create the JSON object with the correct keys
+<span class="nc" id="L222">                    JSONObject accountData = new JSONObject();</span>
+<span class="nc" id="L223">                    accountData.put(&quot;firstname&quot;, firstName);  // Lowercase &quot;firstname&quot;</span>
+<span class="nc" id="L224">                    accountData.put(&quot;lastname&quot;, lastName);    // Lowercase &quot;lastname&quot;</span>
+<span class="nc" id="L225">                    accountData.put(&quot;email&quot;, email);          // Lowercase &quot;email&quot;</span>
+<span class="nc" id="L226">                    accountData.put(&quot;password&quot;, password);    // Lowercase &quot;password&quot;</span>
+<span class="nc" id="L227">                    accountData.put(&quot;role&quot;, role);            // Lowercase &quot;role&quot;</span>
+<span class="nc" id="L228">                    accountData.put(&quot;profilePicture&quot;, profileUrl);</span>
+
+<span class="nc" id="L230">                    System.out.println(&quot;Sending JSON: &quot; + accountData.toString());</span>
+
+                    // Write JSON data to the output stream
+<span class="nc" id="L233">                    OutputStream os = connection.getOutputStream();</span>
+<span class="nc" id="L234">                    os.write(accountData.toString().getBytes(&quot;UTF-8&quot;));</span>
+<span class="nc" id="L235">                    os.flush();</span>
+<span class="nc" id="L236">                    os.close();</span>
+
+<span class="nc" id="L238">                    int responseCode = connection.getResponseCode();</span>
+<span class="nc bnc" id="L239" title="All 2 branches missed.">                    if (responseCode == HttpURLConnection.HTTP_CREATED) {</span>
+<span class="nc" id="L240">                        InputStream inputStream = connection.getInputStream();</span>
+<span class="nc" id="L241">                        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));</span>
+<span class="nc" id="L242">                        StringBuilder response = new StringBuilder();</span>
+                        String line;
+<span class="nc bnc" id="L244" title="All 2 branches missed.">                        while ((line = reader.readLine()) != null) {</span>
+<span class="nc" id="L245">                            response.append(line);</span>
+                        }
+<span class="nc" id="L247">                        reader.close();</span>
+
+<span class="nc" id="L249">                        runOnUiThread(() -&gt; Toast.makeText(SignUp.this, &quot;Created account successfully!! &quot; + responseCode, Toast.LENGTH_SHORT).show());</span>
+<span class="nc" id="L250">                        Intent intent = new Intent(SignUp.this, SignIn.class);</span>
+<span class="nc" id="L251">                        startActivity(intent);</span>
+<span class="nc" id="L252">                    } else {</span>
+<span class="nc" id="L253">                        System.out.println(&quot;Error: &quot; + responseCode);</span>
+                    }
+
+<span class="nc" id="L256">                } catch (IOException | JSONException e) {</span>
+<span class="nc" id="L257">                    e.printStackTrace();</span>
+<span class="nc" id="L258">                }</span>
+<span class="nc" id="L259">            }</span>
+<span class="nc" id="L260">        }).start();</span>
+<span class="nc" id="L261">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span>Generated by the Android Gradle plugin 8.5.2</div></body></html>

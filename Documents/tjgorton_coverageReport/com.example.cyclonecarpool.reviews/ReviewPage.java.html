@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ReviewPage.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debug</a> &gt; <a href="index.source.html" class="el_package">com.example.cyclonecarpool.reviews</a> &gt; <span class="el_source">ReviewPage.java</span></div><h1>ReviewPage.java</h1><pre class="source lang-java linenums">package com.example.cyclonecarpool.reviews;
+
+import android.content.Intent;
+import android.graphics.Color;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.android.volley.Request;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.example.cyclonecarpool.HomePage;
+import com.example.cyclonecarpool.R;
+import com.example.cyclonecarpool.chat.ChatsPage;
+import com.example.cyclonecarpool.trips.MyTripPage;
+import com.example.cyclonecarpool.trips.Trip;
+import com.example.cyclonecarpool.user.ProfilePage;
+import com.example.cyclonecarpool.user.User;
+import com.example.cyclonecarpool.utils.API;
+import com.example.cyclonecarpool.utils.ImageHelper;
+import com.example.cyclonecarpool.utils.VolleySingleton;
+import com.google.gson.Gson;
+
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
+
+/**
+ * The ReviewPage class represents the activity where a user can review the other participants
+ * after a trip. This page can be opened from the TripInfoPage activity.
+ *
+ * @author Tyler Gorton
+ */
+<span class="nc" id="L47">public class ReviewPage extends AppCompatActivity {</span>
+    private Integer userId;
+    private String role;
+
+    private Long tripId;
+    private Trip trip;
+
+    private LinearLayout reviewFormContainer;
+
+    private User user, receiver;
+
+    private ImageView profileBtn;
+
+    public static final String LOG_TAG = &quot;ReviewPage&quot;;
+<span class="nc" id="L61">    Gson gson = new Gson();</span>
+
+    /**
+     * Performs initialization tasks when the activity is created. Sets up UI elements and event
+     * listeners and then calls helper methods to fetch information about the current user and
+     * trip from the server.
+     *
+     * @param savedInstanceState the saved state of the activity
+     */
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+<span class="nc" id="L72">        super.onCreate(savedInstanceState);</span>
+
+<span class="nc" id="L74">        requestWindowFeature(Window.FEATURE_NO_TITLE);</span>
+<span class="nc" id="L75">        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);</span>
+<span class="nc" id="L76">        getSupportActionBar().hide();</span>
+
+<span class="nc" id="L78">        setContentView(R.layout.review_screen);</span>
+
+<span class="nc" id="L80">        Intent intent = getIntent();</span>
+<span class="nc bnc" id="L81" title="All 6 branches missed.">        if (intent != null &amp;&amp; intent.hasExtra(&quot;tripId&quot;) &amp;&amp; intent.hasExtra(&quot;userId&quot;)) {</span>
+<span class="nc" id="L82">            tripId = (long) intent.getIntExtra(&quot;tripId&quot;, -1);</span>
+<span class="nc" id="L83">            userId = intent.getIntExtra(&quot;userId&quot;, -1);</span>
+<span class="nc" id="L84">            role = intent.getStringExtra(&quot;role&quot;);</span>
+        }
+
+<span class="nc" id="L87">        reviewFormContainer = findViewById(R.id.reviewForm_Container);</span>
+
+<span class="nc" id="L89">        Button homeNavBtn = findViewById(R.id.house_navBtn);</span>
+<span class="nc" id="L90">        Button tripsNavBtn = findViewById(R.id.trips_navBtn);</span>
+<span class="nc" id="L91">        Button chatsNavBtn = findViewById(R.id.messages_navBtn);</span>
+<span class="nc" id="L92">        profileBtn = findViewById(R.id.profileBtn);</span>
+
+<span class="nc" id="L94">        homeNavBtn.setOnClickListener(view -&gt; {</span>
+<span class="nc" id="L95">            Intent homeIntent = new Intent(this, HomePage.class);</span>
+<span class="nc" id="L96">            homeIntent.putExtra(&quot;userId&quot;, userId);</span>
+<span class="nc" id="L97">            homeIntent.putExtra(&quot;role&quot;, role);</span>
+<span class="nc" id="L98">            startActivity(homeIntent);</span>
+<span class="nc" id="L99">        });</span>
+<span class="nc" id="L100">        tripsNavBtn.setOnClickListener(view -&gt; {</span>
+<span class="nc" id="L101">            Intent tripsIntent = new Intent(this, MyTripPage.class);</span>
+<span class="nc" id="L102">            tripsIntent.putExtra(&quot;userId&quot;, userId);</span>
+<span class="nc" id="L103">            tripsIntent.putExtra(&quot;role&quot;, role);</span>
+<span class="nc" id="L104">            startActivity(tripsIntent);</span>
+<span class="nc" id="L105">        });</span>
+<span class="nc" id="L106">        chatsNavBtn.setOnClickListener(view -&gt; {</span>
+<span class="nc" id="L107">            Intent msgIntent = new Intent(this, ChatsPage.class);</span>
+<span class="nc" id="L108">            msgIntent.putExtra(&quot;userId&quot;, userId);</span>
+<span class="nc" id="L109">            msgIntent.putExtra(&quot;role&quot;, role);</span>
+<span class="nc" id="L110">            startActivity(msgIntent);</span>
+<span class="nc" id="L111">        });</span>
+<span class="nc" id="L112">        profileBtn.setOnClickListener(view -&gt; {</span>
+<span class="nc" id="L113">            Intent profileIntent = new Intent(this, ProfilePage.class);</span>
+<span class="nc" id="L114">            profileIntent.putExtra(&quot;userId&quot;, userId);</span>
+<span class="nc" id="L115">            profileIntent.putExtra(&quot;role&quot;, role);</span>
+<span class="nc" id="L116">            startActivity(profileIntent);</span>
+<span class="nc" id="L117">        });</span>
+
+<span class="nc" id="L119">        fetchUser();</span>
+<span class="nc" id="L120">        fetchTripInfo();</span>
+<span class="nc" id="L121">    }</span>
+
+    /**
+     * Fetches trip information from the server. Uses Volley to make the request and calls helper
+     * methods in the response handler to populate the UI with review forms for each participant,
+     * excluding the current user.
+     */
+    private void fetchTripInfo() {
+<span class="nc" id="L129">        JsonObjectRequest tripRequest = new JsonObjectRequest(</span>
+                Request.Method.GET,
+                API.TRIP_URL + tripId,
+                null,
+                response -&gt; {
+<span class="nc" id="L134">                    Log.d(LOG_TAG, &quot;Trip Response: &quot; + response.toString());</span>
+                    try {
+<span class="nc" id="L136">                        trip = gson.fromJson(response.toString(), Trip.class);</span>
+<span class="nc bnc" id="L137" title="All 2 branches missed.">                        if (userId != trip.getDriverId()) {</span>
+<span class="nc" id="L138">                            fetchDriver(trip.getDriverId());</span>
+                        }
+<span class="nc bnc" id="L140" title="All 2 branches missed.">                        for (User user : trip.getPassengers()) {</span>
+<span class="nc bnc" id="L141" title="All 2 branches missed.">                            if (Objects.equals(userId, user.getIntId())) {</span>
+<span class="nc" id="L142">                                continue;</span>
+                            }
+<span class="nc" id="L144">                            populateUser(user);</span>
+<span class="nc" id="L145">                        }</span>
+<span class="nc" id="L146">                    } catch (Exception e) {</span>
+<span class="nc" id="L147">                        throw new RuntimeException(e);</span>
+<span class="nc" id="L148">                    }</span>
+<span class="nc" id="L149">                },</span>
+                error -&gt; {
+<span class="nc" id="L151">                    Log.e(LOG_TAG, &quot;Error fetching trip&quot;, error);</span>
+<span class="nc" id="L152">                    Toast.makeText(ReviewPage.this, &quot;Error fetching trip&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc" id="L153">                }</span>
+        );
+<span class="nc" id="L155">        VolleySingleton.getInstance(this).addToRequestQueue(tripRequest);</span>
+<span class="nc" id="L156">    }</span>
+
+    /**
+     * Fetches user information from the server. Uses Volley to make the request and assigns the
+     * &lt;code&gt;user&lt;/code&gt; class variable in the response handler.
+     */
+    private void fetchUser() {
+<span class="nc" id="L163">        JsonObjectRequest userRequest = new JsonObjectRequest(</span>
+                Request.Method.GET,
+                API.USER_URL + userId,
+                null,
+                response -&gt; {
+<span class="nc" id="L168">                    Log.d(LOG_TAG, &quot;User Response: &quot; + response.toString());</span>
+<span class="nc" id="L169">                    user = gson.fromJson(response.toString(), User.class);</span>
+<span class="nc" id="L170">                    ImageHelper.loadProfilePic(this, user.getProfilePicture(), profileBtn);</span>
+<span class="nc" id="L171">                },</span>
+                error -&gt; {
+<span class="nc" id="L173">                    Log.e(LOG_TAG, &quot;Error fetching user&quot;, error);</span>
+<span class="nc" id="L174">                    Toast.makeText(ReviewPage.this, &quot;Error fetching user&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc" id="L175">                }</span>
+        );
+<span class="nc" id="L177">        VolleySingleton.getInstance(this).addToRequestQueue(userRequest);</span>
+<span class="nc" id="L178">    }</span>
+
+    /**
+     * Fetches the driver of the trip from the server. Uses Volley to make the request and calls
+     * a helper method in the response handler to populate the UI with the driver's information.
+     */
+    private void fetchDriver(long userId) {
+<span class="nc" id="L185">        JsonObjectRequest driverRequest = new JsonObjectRequest(</span>
+                Request.Method.GET,
+                API.USER_URL + userId,
+                null,
+                response -&gt; {
+<span class="nc" id="L190">                    Log.d(LOG_TAG, &quot;Driver Response: &quot; + response.toString());</span>
+<span class="nc" id="L191">                    User driver = gson.fromJson(response.toString(), User.class);</span>
+<span class="nc" id="L192">                    populateUser(driver);</span>
+<span class="nc" id="L193">                },</span>
+                error -&gt; {
+<span class="nc" id="L195">                    Log.e(LOG_TAG, &quot;Error fetching driver&quot;, error);</span>
+<span class="nc" id="L196">                    Toast.makeText(ReviewPage.this, &quot;Error fetching driver&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc" id="L197">                }</span>
+        );
+<span class="nc" id="L199">        VolleySingleton.getInstance(this).addToRequestQueue(driverRequest);</span>
+<span class="nc" id="L200">    }</span>
+
+    /**
+     * Given a user, populates the UI with the user's information. The resulting UI includes
+     * buttons to rate the user from 1-5 stars and a text input field for a review.
+     *
+     * @param receiver The user to populate the UI with.
+     */
+    private void populateUser(User receiver) {
+<span class="nc" id="L209">        View reviewFormView = LayoutInflater.from(this).inflate(R.layout.review_form, reviewFormContainer, false);</span>
+
+<span class="nc" id="L211">        ImageView userImage = reviewFormView.findViewById(R.id.user_image);</span>
+<span class="nc" id="L212">        TextView userName = reviewFormView.findViewById(R.id.user_name);</span>
+<span class="nc" id="L213">        View star1 = reviewFormView.findViewById(R.id.star_1);</span>
+<span class="nc" id="L214">        View star2 = reviewFormView.findViewById(R.id.star_2);</span>
+<span class="nc" id="L215">        View star3 = reviewFormView.findViewById(R.id.star_3);</span>
+<span class="nc" id="L216">        View star4 = reviewFormView.findViewById(R.id.star_4);</span>
+<span class="nc" id="L217">        View star5 = reviewFormView.findViewById(R.id.star_5);</span>
+<span class="nc" id="L218">        EditText reviewInput = reviewFormView.findViewById(R.id.review_input);</span>
+<span class="nc" id="L219">        Button reviewSubmitButton = reviewFormView.findViewById(R.id.message_send);</span>
+
+<span class="nc" id="L221">        userName.setText(receiver.getFullName());</span>
+<span class="nc" id="L222">        ImageHelper.loadProfilePic(this, receiver.getProfilePicture(), userImage);</span>
+
+<span class="nc" id="L224">        AtomicReference&lt;Integer&gt; rating = new AtomicReference&lt;&gt;(0);</span>
+
+<span class="nc" id="L226">        star1.setOnClickListener(view -&gt; {</span>
+<span class="nc" id="L227">            rating.set(1);</span>
+<span class="nc" id="L228">            star1.setBackground(getResources().getDrawable(R.drawable.icon_star_h, getTheme()));</span>
+<span class="nc" id="L229">            star2.setBackground(getResources().getDrawable(R.drawable.icon_star, getTheme()));</span>
+<span class="nc" id="L230">            star3.setBackground(getResources().getDrawable(R.drawable.icon_star, getTheme()));</span>
+<span class="nc" id="L231">            star4.setBackground(getResources().getDrawable(R.drawable.icon_star, getTheme()));</span>
+<span class="nc" id="L232">            star5.setBackground(getResources().getDrawable(R.drawable.icon_star, getTheme()));</span>
+<span class="nc" id="L233">        });</span>
+<span class="nc" id="L234">        star2.setOnClickListener(view -&gt; {</span>
+<span class="nc" id="L235">            rating.set(2);</span>
+<span class="nc" id="L236">            star1.setBackground(getResources().getDrawable(R.drawable.icon_star_h, getTheme()));</span>
+<span class="nc" id="L237">            star2.setBackground(getResources().getDrawable(R.drawable.icon_star_h, getTheme()));</span>
+<span class="nc" id="L238">            star3.setBackground(getResources().getDrawable(R.drawable.icon_star, getTheme()));</span>
+<span class="nc" id="L239">            star4.setBackground(getResources().getDrawable(R.drawable.icon_star, getTheme()));</span>
+<span class="nc" id="L240">            star5.setBackground(getResources().getDrawable(R.drawable.icon_star, getTheme()));</span>
+<span class="nc" id="L241">        });</span>
+<span class="nc" id="L242">        star3.setOnClickListener(view -&gt; {</span>
+<span class="nc" id="L243">            rating.set(3);</span>
+<span class="nc" id="L244">            star1.setBackground(getResources().getDrawable(R.drawable.icon_star_h, getTheme()));</span>
+<span class="nc" id="L245">            star2.setBackground(getResources().getDrawable(R.drawable.icon_star_h, getTheme()));</span>
+<span class="nc" id="L246">            star3.setBackground(getResources().getDrawable(R.drawable.icon_star_h, getTheme()));</span>
+<span class="nc" id="L247">            star4.setBackground(getResources().getDrawable(R.drawable.icon_star, getTheme()));</span>
+<span class="nc" id="L248">            star5.setBackground(getResources().getDrawable(R.drawable.icon_star, getTheme()));</span>
+<span class="nc" id="L249">        });</span>
+<span class="nc" id="L250">        star4.setOnClickListener(view -&gt; {</span>
+<span class="nc" id="L251">            rating.set(4);</span>
+<span class="nc" id="L252">            star1.setBackground(getResources().getDrawable(R.drawable.icon_star_h, getTheme()));</span>
+<span class="nc" id="L253">            star2.setBackground(getResources().getDrawable(R.drawable.icon_star_h, getTheme()));</span>
+<span class="nc" id="L254">            star3.setBackground(getResources().getDrawable(R.drawable.icon_star_h, getTheme()));</span>
+<span class="nc" id="L255">            star4.setBackground(getResources().getDrawable(R.drawable.icon_star_h, getTheme()));</span>
+<span class="nc" id="L256">            star5.setBackground(getResources().getDrawable(R.drawable.icon_star, getTheme()));</span>
+<span class="nc" id="L257">        });</span>
+<span class="nc" id="L258">        star5.setOnClickListener(view -&gt; {</span>
+<span class="nc" id="L259">            rating.set(5);</span>
+<span class="nc" id="L260">            star1.setBackground(getResources().getDrawable(R.drawable.icon_star_h, getTheme()));</span>
+<span class="nc" id="L261">            star2.setBackground(getResources().getDrawable(R.drawable.icon_star_h, getTheme()));</span>
+<span class="nc" id="L262">            star3.setBackground(getResources().getDrawable(R.drawable.icon_star_h, getTheme()));</span>
+<span class="nc" id="L263">            star4.setBackground(getResources().getDrawable(R.drawable.icon_star_h, getTheme()));</span>
+<span class="nc" id="L264">            star5.setBackground(getResources().getDrawable(R.drawable.icon_star_h, getTheme()));</span>
+<span class="nc" id="L265">        });</span>
+
+<span class="nc" id="L267">        reviewSubmitButton.setOnClickListener(view -&gt; {</span>
+<span class="nc" id="L268">            Review review = new Review(this.user, receiver, trip, reviewInput.getText().toString(), rating.get());</span>
+<span class="nc" id="L269">            postReview(review);</span>
+<span class="nc" id="L270">        });</span>
+
+<span class="nc" id="L272">        reviewFormContainer.addView(reviewFormView);</span>
+<span class="nc" id="L273">    }</span>
+
+    /**
+     * Posts a given Review object to the server. Uses Volley to make the request.
+     *
+     * @param review The Review object to post.
+     */
+    private void postReview(Review review) {
+<span class="nc" id="L281">        StringRequest reviewRequest = new StringRequest(</span>
+                Request.Method.POST,
+                API.TRIP_URL + &quot;review&quot;,
+                response -&gt; {
+<span class="nc" id="L285">                    Log.d(LOG_TAG, &quot;Post Review Response: &quot; + response.toString());</span>
+<span class="nc" id="L286">                },</span>
+                error -&gt; {
+<span class="nc" id="L288">                    Log.e(LOG_TAG, &quot;Post Review Error: &quot; + error.toString());</span>
+<span class="nc" id="L289">                }</span>
+<span class="nc" id="L290">        ) {</span>
+            @Override
+            public Map&lt;String, String&gt; getHeaders() {
+<span class="nc" id="L293">                Map&lt;String, String&gt; headers = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L294">                headers.put(&quot;Content-Type&quot;, &quot;application/json&quot;);</span>
+<span class="nc" id="L295">                headers.put(&quot;Accept&quot;, &quot;application/json&quot;);</span>
+<span class="nc" id="L296">                return headers;</span>
+            }
+            @Override
+            public byte[] getBody() {
+<span class="nc" id="L300">                return gson.toJson(review).getBytes(StandardCharsets.UTF_8);</span>
+            }
+        };
+<span class="nc" id="L303">        VolleySingleton.getInstance(this).addToRequestQueue(reviewRequest);</span>
+<span class="nc" id="L304">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span>Generated by the Android Gradle plugin 8.5.2</div></body></html>

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+<!--    Header    -->
+    <TextView
+        android:id="@+id/page_header"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:gravity="center"
+        android:fontFamily="@font/proximanova_extrabold"
+        android:text="@string/review_heading"
+        android:textAppearance="@style/trips_near_"
+        android:background="#C8102E"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+<!--    Body    -->
+    <ScrollView
+        android:id="@+id/reviewForm_ScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="630dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/page_header">
+
+        <LinearLayout
+            android:id="@+id/reviewForm_Container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+    </ScrollView>
+
+<!--    Footer    -->
+    <LinearLayout
+        android:id="@+id/navbar"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:background="#C8102E"
+        android:orientation="horizontal"
+        android:gravity="center"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" >
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/house_navBtn"
+            android:layout_width="36dp"
+            android:layout_height="32dp"
+            android:layout_marginHorizontal="10dp"
+            android:background="@drawable/icon_home"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/navbar" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/trips_navBtn"
+            android:layout_width="36dp"
+            android:layout_height="32dp"
+            android:layout_marginHorizontal="10dp"
+            android:background="@drawable/icon_road"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/house_navBtn"
+            app:layout_constraintTop_toTopOf="@+id/navbar" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/messages_navBtn"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:layout_marginHorizontal="10dp"
+            android:background="@drawable/icon_mail"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/profileBtn"
+            app:layout_constraintTop_toTopOf="@+id/navbar" />
+
+        <ImageView
+            android:id="@+id/profileBtn"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginHorizontal="10dp"
+            android:translationZ="5dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/navbar"
+            app:srcCompat="@drawable/icon_plus" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

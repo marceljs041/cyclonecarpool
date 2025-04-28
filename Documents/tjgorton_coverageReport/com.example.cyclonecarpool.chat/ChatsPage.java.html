@@ -1,0 +1,383 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ChatsPage.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debug</a> &gt; <a href="index.source.html" class="el_package">com.example.cyclonecarpool.chat</a> &gt; <span class="el_source">ChatsPage.java</span></div><h1>ChatsPage.java</h1><pre class="source lang-java linenums">package com.example.cyclonecarpool.chat;
+
+import android.content.Intent;
+import android.graphics.Color;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.android.volley.Request;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+import com.example.cyclonecarpool.utils.API;
+import com.example.cyclonecarpool.utils.CircleBorderTransform;
+import com.example.cyclonecarpool.trips.CreateTripPage;
+import com.example.cyclonecarpool.HomePage;
+import com.example.cyclonecarpool.trips.MyTripPage;
+import com.example.cyclonecarpool.user.ProfilePage;
+import com.example.cyclonecarpool.R;
+import com.example.cyclonecarpool.user.User;
+import com.example.cyclonecarpool.utils.ImageHelper;
+import com.example.cyclonecarpool.utils.VolleySingleton;
+import com.google.gson.Gson;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+<span class="nc" id="L50">public class ChatsPage extends AppCompatActivity implements View.OnClickListener, WebSocketHelper.WebSocketListener {</span>
+
+<span class="nc" id="L52">    public static String role = null;</span>
+<span class="nc" id="L53">    public Integer userId = null;</span>
+
+    private Button homeNavBtn, tripsNavBtn, createTripBtn, messagesTripBtn, profilePageBtn;
+    private LinearLayout chatContainer;
+    private ImageView profileBtn;
+    private ScrollView chatScrollView;
+    private View plus;
+
+<span class="nc" id="L61">    private Gson gson = new Gson();</span>
+    private WebSocketHelper webSocketHelper;
+    private String webSocketUrl;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+<span class="nc" id="L67">        super.onCreate(savedInstanceState);</span>
+
+<span class="nc" id="L69">        requestWindowFeature(Window.FEATURE_NO_TITLE);</span>
+<span class="nc" id="L70">        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);</span>
+<span class="nc" id="L71">        getSupportActionBar().hide();</span>
+
+<span class="nc" id="L73">        Intent intent = getIntent();</span>
+<span class="nc bnc" id="L74" title="All 6 branches missed.">        if (intent != null &amp;&amp; intent.hasExtra(&quot;userId&quot;) &amp;&amp; intent.hasExtra(&quot;role&quot;)) {</span>
+<span class="nc" id="L75">            int userId = intent.getIntExtra(&quot;userId&quot;, -1); // Default to -1 if not found</span>
+<span class="nc" id="L76">            String role = intent.getStringExtra(&quot;role&quot;);</span>
+
+            // Set the userId and role in HomePage
+<span class="nc" id="L79">            this.userId = userId;</span>
+<span class="nc" id="L80">            this.role = role;</span>
+        }
+
+<span class="nc" id="L83">        setContentView(R.layout.chats_screen);</span>
+
+<span class="nc" id="L85">        chatContainer = findViewById(R.id.chat_Container);</span>
+<span class="nc" id="L86">        chatScrollView = findViewById(R.id.chatsScrollView);</span>
+
+<span class="nc" id="L88">        homeNavBtn = findViewById(R.id.house_navBtn);</span>
+<span class="nc" id="L89">        tripsNavBtn = findViewById(R.id.trips_navBtn);</span>
+<span class="nc" id="L90">        createTripBtn = findViewById(R.id.btnCreate);</span>
+<span class="nc" id="L91">        messagesTripBtn = findViewById(R.id.messages_navBtn);</span>
+<span class="nc" id="L92">        profileBtn = findViewById(R.id.profileBtn);</span>
+<span class="nc" id="L93">        plus = findViewById(R.id.plus_solid);</span>
+
+<span class="nc" id="L95">        homeNavBtn.setOnClickListener(this);</span>
+<span class="nc" id="L96">        tripsNavBtn.setOnClickListener(this);</span>
+<span class="nc" id="L97">        createTripBtn.setOnClickListener(this);</span>
+<span class="nc" id="L98">        messagesTripBtn.setOnClickListener(this);</span>
+<span class="nc" id="L99">        profileBtn.setOnClickListener(this);</span>
+
+<span class="nc" id="L101">        reqChats();</span>
+
+<span class="nc" id="L103">        webSocketUrl = &quot;ws://coms-3090-029.class.las.iastate.edu:8080/chats/&quot; + userId;</span>
+<span class="nc" id="L104">        webSocketHelper = new WebSocketHelper(webSocketUrl, this);</span>
+<span class="nc" id="L105">        webSocketHelper.connect();</span>
+
+<span class="nc" id="L107">        setupRoleBasedUI();</span>
+<span class="nc" id="L108">        makeProfilePicReq();</span>
+<span class="nc" id="L109">    }</span>
+
+    @Override
+    public void onMessageReceived(String message) {
+<span class="nc" id="L113">        runOnUiThread(() -&gt; {</span>
+            try {
+<span class="nc" id="L115">                JSONObject msgObj = new JSONObject(message);</span>
+<span class="nc" id="L116">                String content = msgObj.getString(&quot;content&quot;);</span>
+<span class="nc bnc" id="L117" title="All 2 branches missed.">                Integer otherUserId = msgObj.getInt(&quot;senderId&quot;) == userId ? msgObj.getInt(&quot;receiverId&quot;) : msgObj.getInt(&quot;senderId&quot;);</span>
+<span class="nc" id="L118">                String otherUserName = msgObj.getString(&quot;senderName&quot;);  // Assuming the name is provided</span>
+<span class="nc" id="L119">                updateChatPreview(otherUserId, otherUserName, content);</span>
+<span class="nc" id="L120">            } catch (JSONException e) {</span>
+<span class="nc" id="L121">                Log.e(&quot;ChatsPage&quot;, &quot;Error parsing WebSocket message&quot;, e);</span>
+<span class="nc" id="L122">            }</span>
+<span class="nc" id="L123">        });</span>
+<span class="nc" id="L124">    }</span>
+
+    private void updateChatPreview(Integer otherUserId, String otherUserName, String lastMessage) {
+<span class="nc bnc" id="L127" title="All 2 branches missed.">        for (int i = 0; i &lt; chatContainer.getChildCount(); i++) {</span>
+<span class="nc" id="L128">            View chatItemView = chatContainer.getChildAt(i);</span>
+<span class="nc" id="L129">            TextView chatName = chatItemView.findViewById(R.id.chat_name);</span>
+<span class="nc bnc" id="L130" title="All 2 branches missed.">            if (chatName.getTag().equals(otherUserId)) {</span>
+<span class="nc" id="L131">                TextView chatPreview = chatItemView.findViewById(R.id.chat_preview);</span>
+<span class="nc" id="L132">                chatPreview.setText(lastMessage);</span>
+<span class="nc" id="L133">                return;</span>
+            }
+        }
+        // If chat not found, create a new chat item
+<span class="nc" id="L137">        View chatItemView = LayoutInflater.from(this).inflate(R.layout.chat_item, chatContainer, false);</span>
+<span class="nc" id="L138">        TextView chatName = chatItemView.findViewById(R.id.chat_name);</span>
+<span class="nc" id="L139">        chatName.setText(otherUserName);</span>
+<span class="nc" id="L140">        chatName.setTag(otherUserId);</span>
+<span class="nc" id="L141">        TextView chatPreview = chatItemView.findViewById(R.id.chat_preview);</span>
+<span class="nc" id="L142">        chatPreview.setText(lastMessage);</span>
+
+<span class="nc" id="L144">        chatItemView.setOnClickListener(v -&gt; {</span>
+<span class="nc" id="L145">            Intent intent = new Intent(ChatsPage.this, MessagingPage.class);</span>
+<span class="nc" id="L146">            intent.putExtra(&quot;userId&quot;, userId);</span>
+<span class="nc" id="L147">            intent.putExtra(&quot;otherId&quot;, otherUserId);</span>
+<span class="nc" id="L148">            startActivity(intent);</span>
+<span class="nc" id="L149">        });</span>
+<span class="nc" id="L150">        chatContainer.addView(chatItemView);</span>
+<span class="nc" id="L151">    }</span>
+
+    @Override
+    protected void onDestroy() {
+<span class="nc" id="L155">        super.onDestroy();</span>
+<span class="nc" id="L156">        webSocketHelper.close();</span>
+<span class="nc" id="L157">    }</span>
+
+    @Override
+    public void onClick(View v) {
+<span class="nc" id="L161">        int id = v.getId();</span>
+<span class="nc bnc" id="L162" title="All 2 branches missed.">        if (id == R.id.house_navBtn) {</span>
+<span class="nc" id="L163">            Intent intent = new Intent(this, HomePage.class);</span>
+<span class="nc" id="L164">            intent.putExtra(&quot;userId&quot;, userId);</span>
+<span class="nc" id="L165">            intent.putExtra(&quot;role&quot;, role);</span>
+<span class="nc" id="L166">            startActivity(intent);</span>
+<span class="nc bnc" id="L167" title="All 2 branches missed.">        } else if (id == R.id.trips_navBtn) {</span>
+<span class="nc" id="L168">            Intent intent = new Intent(this, MyTripPage.class);</span>
+<span class="nc" id="L169">            intent.putExtra(&quot;userId&quot;, userId);</span>
+<span class="nc" id="L170">            intent.putExtra(&quot;role&quot;, role);</span>
+<span class="nc" id="L171">            startActivity(intent);</span>
+<span class="nc bnc" id="L172" title="All 2 branches missed.">        } else if (id == R.id.btnCreate) {</span>
+<span class="nc bnc" id="L173" title="All 2 branches missed.">            if (!role.equals(&quot;Passenger&quot;)) {</span>
+<span class="nc" id="L174">                Intent intent = new Intent(ChatsPage.this, CreateTripPage.class);</span>
+<span class="nc" id="L175">                intent.putExtra(&quot;userId&quot;, userId); // Pass userId to CreateTripPage</span>
+<span class="nc" id="L176">                startActivity(intent);</span>
+<span class="nc" id="L177">            }</span>
+<span class="nc bnc" id="L178" title="All 2 branches missed.">        } else if (id == R.id.messages_navBtn) {</span>
+<span class="nc" id="L179">            chatContainer.removeAllViews();</span>
+//            populateChatContainer();
+<span class="nc" id="L181">            reqChats();</span>
+<span class="nc bnc" id="L182" title="All 2 branches missed.">        } else if (id == R.id.profileBtn) {</span>
+<span class="nc" id="L183">            Intent intent = new Intent(this, ProfilePage.class);</span>
+<span class="nc" id="L184">            intent.putExtra(&quot;userId&quot;, userId);</span>
+<span class="nc" id="L185">            intent.putExtra(&quot;role&quot;, role);</span>
+<span class="nc" id="L186">            startActivity(intent);</span>
+        }
+<span class="nc" id="L188">    }</span>
+
+    private void setupRoleBasedUI() {
+        // Hide the Create button if role is Passenger
+<span class="nc bnc" id="L192" title="All 2 branches missed.">        if (role.equals(&quot;Passenger&quot;)) {</span>
+<span class="nc" id="L193">            createTripBtn.setVisibility(View.GONE);</span>
+<span class="nc" id="L194">            plus.setVisibility(View.GONE);</span>
+        }
+
+        // Enable delete functionality if role is Admin
+<span class="nc bnc" id="L198" title="All 2 branches missed.">        else if (role.equals(&quot;Admin&quot;)) {</span>
+<span class="nc" id="L199">            createTripBtn.setVisibility(View.VISIBLE); // Admins can create trips</span>
+
+<span class="nc bnc" id="L201" title="All 2 branches missed.">        } else if (role.equals(&quot;Driver&quot;)) {</span>
+<span class="nc" id="L202">            createTripBtn.setVisibility(View.VISIBLE); // Drivers can create trips</span>
+        }
+<span class="nc" id="L204">    }</span>
+
+    private void populateChatContainer() {
+<span class="nc" id="L207">        List&lt;ChatItem&gt; chats = getChats();</span>
+
+<span class="nc" id="L209">        populateChatContainer(chats);</span>
+<span class="nc" id="L210">    }</span>
+
+    private void populateChatContainer(List&lt;ChatItem&gt; chats) {
+<span class="nc bnc" id="L213" title="All 2 branches missed.">        for (ChatItem chat : chats) {</span>
+<span class="nc" id="L214">            View chatItemView = LayoutInflater.from(this)</span>
+<span class="nc" id="L215">                    .inflate(R.layout.chat_item, chatContainer, false);</span>
+
+<span class="nc" id="L217">            View chatImage = chatItemView.findViewById(R.id.chat_image);</span>
+<span class="nc" id="L218">            TextView chatName = chatItemView.findViewById(R.id.chat_name);</span>
+<span class="nc" id="L219">            TextView chatPreview = chatItemView.findViewById(R.id.chat_preview);</span>
+<span class="nc" id="L220">            Button chatButton = chatItemView.findViewById(R.id.chat_open);</span>
+
+<span class="nc" id="L222">            String otherUserName = chat.getOtherName();</span>
+<span class="nc" id="L223">            chatName.setText(otherUserName);</span>
+
+<span class="nc" id="L225">            String lastMessage = chat.getLastMessage();</span>
+<span class="nc" id="L226">            chatPreview.setText(lastMessage);</span>
+
+<span class="nc" id="L228">            chatButton.setOnClickListener(view -&gt; {</span>
+<span class="nc" id="L229">                Intent intent = new Intent(ChatsPage.this, MessagingPage.class);</span>
+<span class="nc" id="L230">                intent.putExtra(&quot;userId&quot;, userId);</span>
+<span class="nc" id="L231">                intent.putExtra(&quot;role&quot;, role);</span>
+<span class="nc" id="L232">                intent.putExtra(&quot;otherId&quot;, chat.getOtherId());</span>
+<span class="nc" id="L233">                startActivity(intent);</span>
+<span class="nc" id="L234">            });</span>
+
+<span class="nc" id="L236">            chatContainer.addView(chatItemView);</span>
+<span class="nc" id="L237">        }</span>
+<span class="nc" id="L238">    }</span>
+
+    private List&lt;ChatItem&gt; getChats() {
+<span class="nc" id="L241">        List&lt;ChatItem&gt; chats = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L242">        chats.add(new ChatItem(</span>
+<span class="nc" id="L243">                0,</span>
+                &quot;Marcel S.&quot;,
+                &quot;https://firebasestorage.googleapis.com/v0/b/cyclonecarpool.appspot.com/o/placeholderprofilepic.png?alt=media&amp;token=1e53480d-f70e-4be3-8e73-03c5c8fe4b3d&quot;,
+                &quot;Knowledge is what remains after one has forgotten...&quot;
+        ));
+<span class="nc" id="L248">        chats.add(new ChatItem(</span>
+<span class="nc" id="L249">                0,</span>
+                &quot;Marcel S.&quot;,
+                &quot;https://firebasestorage.googleapis.com/v0/b/cyclonecarpool.appspot.com/o/placeholderprofilepic.png?alt=media&amp;token=1e53480d-f70e-4be3-8e73-03c5c8fe4b3d&quot;,
+                &quot;Knowledge is what remains after one has forgotten...&quot;
+        ));
+<span class="nc" id="L254">        chats.add(new ChatItem(</span>
+<span class="nc" id="L255">                0,</span>
+                &quot;Marcel S.&quot;,
+                &quot;https://firebasestorage.googleapis.com/v0/b/cyclonecarpool.appspot.com/o/placeholderprofilepic.png?alt=media&amp;token=1e53480d-f70e-4be3-8e73-03c5c8fe4b3d&quot;,
+                &quot;Knowledge is what remains after one has forgotten...&quot;
+        ));
+<span class="nc" id="L260">        chats.add(new ChatItem(</span>
+<span class="nc" id="L261">                0,</span>
+                &quot;Marcel S.&quot;,
+                &quot;https://firebasestorage.googleapis.com/v0/b/cyclonecarpool.appspot.com/o/placeholderprofilepic.png?alt=media&amp;token=1e53480d-f70e-4be3-8e73-03c5c8fe4b3d&quot;,
+                &quot;Knowledge is what remains after one has forgotten...&quot;
+        ));
+<span class="nc" id="L266">        chats.add(new ChatItem(</span>
+<span class="nc" id="L267">                0,</span>
+                &quot;Marcel S.&quot;,
+                &quot;https://firebasestorage.googleapis.com/v0/b/cyclonecarpool.appspot.com/o/placeholderprofilepic.png?alt=media&amp;token=1e53480d-f70e-4be3-8e73-03c5c8fe4b3d&quot;,
+                &quot;Knowledge is what remains after one has forgotten...&quot;
+        ));
+<span class="nc" id="L272">        chats.add(new ChatItem(</span>
+<span class="nc" id="L273">                0,</span>
+                &quot;Marcel S.&quot;,
+                &quot;https://firebasestorage.googleapis.com/v0/b/cyclonecarpool.appspot.com/o/placeholderprofilepic.png?alt=media&amp;token=1e53480d-f70e-4be3-8e73-03c5c8fe4b3d&quot;,
+                &quot;Knowledge is what remains after one has forgotten...&quot;
+        ));
+<span class="nc" id="L278">        return chats;</span>
+    }
+
+    private void reqChats() {
+<span class="nc" id="L282">        JsonArrayRequest chatRequest = new JsonArrayRequest(</span>
+                Request.Method.GET,
+                API.MSG_URL + &quot;conversation/all/&quot; + userId,
+                null,
+                response -&gt; {
+<span class="nc" id="L287">                    Map&lt;Integer, Message&gt; latestMessagesByTrip = new HashMap&lt;&gt;();</span>
+
+<span class="nc bnc" id="L289" title="All 2 branches missed.">                    for (int i = 0; i &lt; response.length(); i++) {</span>
+                        try {
+                            // Get the JSON object for the current message
+<span class="nc" id="L292">                            JSONObject messageJson = response.getJSONObject(i);</span>
+
+                            // Extract the tripId directly from the JSON object
+<span class="nc" id="L295">                            Integer tripId = messageJson.getInt(&quot;tripId&quot;);</span>
+
+                            // Proceed only if tripId is valid
+<span class="nc bnc" id="L298" title="All 2 branches missed.">                            if (tripId != null) {</span>
+                                // Deserialize the message JSON into a Message object
+<span class="nc" id="L300">                                Message msg = gson.fromJson(messageJson.toString(), Message.class);</span>
+
+                                // Get the timestamp of the current message
+<span class="nc" id="L303">                                Timestamp msgTimestamp = (Timestamp) msg.getTimestamp();</span>
+
+                                // Retrieve any existing message for this tripId
+<span class="nc" id="L306">                                Message existingMessage = latestMessagesByTrip.get(tripId);</span>
+<span class="nc bnc" id="L307" title="All 2 branches missed.">                                Timestamp existingTimestamp = existingMessage != null</span>
+<span class="nc" id="L308">                                        ? (Timestamp) existingMessage.getTimestamp()</span>
+<span class="nc" id="L309">                                        : null;</span>
+
+                                // Update the map if this message is more recent
+<span class="nc bnc" id="L312" title="All 6 branches missed.">                                if (existingTimestamp == null || (msgTimestamp != null &amp;&amp; msgTimestamp.getTime() &gt; existingTimestamp.getTime())) {</span>
+<span class="nc" id="L313">                                    latestMessagesByTrip.put(tripId, msg); // Store the latest message for this tripId</span>
+                                }
+<span class="nc" id="L315">                            } else {</span>
+<span class="nc" id="L316">                                Log.e(&quot;[Chats] Null tripId&quot;, &quot;Skipping message due to missing trip ID&quot;);</span>
+                            }
+<span class="nc" id="L318">                        } catch (JSONException e) {</span>
+<span class="nc" id="L319">                            Log.e(&quot;[Chats] JSON Error&quot;, e.toString());</span>
+<span class="nc" id="L320">                        }</span>
+                    }
+
+                    // Populate the chat container with one entry per unique tripId
+<span class="nc" id="L324">                    List&lt;ChatItem&gt; chats = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L325" title="All 2 branches missed.">                    for (Map.Entry&lt;Integer, Message&gt; entry : latestMessagesByTrip.entrySet()) {</span>
+<span class="nc" id="L326">                        Integer tripId = entry.getKey();</span>
+<span class="nc" id="L327">                        Message latestMessage = entry.getValue();</span>
+<span class="nc" id="L328">                        String chatTitle = &quot;Trip &quot; + tripId;  // Title for the chat item</span>
+
+                        // Parse the content field to extract the actual message text
+                        String content;
+                        try {
+<span class="nc" id="L333">                            JSONObject contentJson = new JSONObject(latestMessage.getContent());</span>
+<span class="nc" id="L334">                            content = contentJson.getString(&quot;content&quot;);</span>
+<span class="nc" id="L335">                        } catch (JSONException e) {</span>
+<span class="nc" id="L336">                            content = latestMessage.getContent();</span>
+<span class="nc" id="L337">                        }</span>
+
+                        // Add a single chat item for this unique tripId with the latest message content
+<span class="nc" id="L340">                        chats.add(new ChatItem(tripId, chatTitle, null, content));</span>
+<span class="nc" id="L341">                    }</span>
+
+<span class="nc" id="L343">                    populateChatContainer(chats); // Populate UI with only unique trip entries</span>
+<span class="nc" id="L344">                },</span>
+<span class="nc" id="L345">                error -&gt; Log.e(&quot;[Chats] Volley Error&quot;, error.toString())</span>
+        );
+<span class="nc" id="L347">        VolleySingleton.getInstance(getApplicationContext()).addToRequestQueue(chatRequest);</span>
+<span class="nc" id="L348">    }</span>
+
+
+    private void makeProfilePicReq() {
+<span class="nc" id="L352">        new Thread(() -&gt; {</span>
+            try {
+<span class="nc" id="L354">                URL url = new URL(API.USER_URL + &quot;profilePic/&quot; + userId);</span>
+<span class="nc" id="L355">                HttpURLConnection conn = (HttpURLConnection) url.openConnection();</span>
+<span class="nc" id="L356">                conn.setRequestMethod(&quot;GET&quot;);</span>
+<span class="nc" id="L357">                conn.setConnectTimeout(5000);</span>
+<span class="nc" id="L358">                conn.setReadTimeout(5000);</span>
+
+<span class="nc" id="L360">                int responseCode = conn.getResponseCode();</span>
+<span class="nc bnc" id="L361" title="All 2 branches missed.">                if (responseCode == HttpURLConnection.HTTP_OK) {</span>
+<span class="nc" id="L362">                    BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));</span>
+<span class="nc" id="L363">                    StringBuilder response = new StringBuilder();</span>
+                    String inputLine;
+<span class="nc bnc" id="L365" title="All 2 branches missed.">                    while ((inputLine = in.readLine()) != null) {</span>
+<span class="nc" id="L366">                        response.append(inputLine);</span>
+                    }
+<span class="nc" id="L368">                    in.close();</span>
+
+<span class="nc" id="L370">                    String profilePicUrl = response.toString().trim();</span>
+
+<span class="nc" id="L372">                    runOnUiThread(() -&gt; ImageHelper.loadProfilePic(ChatsPage.this, profilePicUrl, profileBtn));</span>
+<span class="nc" id="L373">                } else {</span>
+<span class="nc" id="L374">                    Log.e(&quot;HTTP Request&quot;, &quot;Failed to get profile picture. Response Code: &quot; + responseCode);</span>
+                }
+<span class="nc" id="L376">            } catch (Exception e) {</span>
+<span class="nc" id="L377">                Log.e(&quot;HTTP Request&quot;, &quot;Error fetching profile picture&quot;, e);</span>
+<span class="nc" id="L378">            }</span>
+<span class="nc" id="L379">        }).start();</span>
+<span class="nc" id="L380">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span>Generated by the Android Gradle plugin 8.5.2</div></body></html>

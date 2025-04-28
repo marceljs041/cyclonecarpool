@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:elevation="10dp"
+    >
+
+    <View
+        android:id="@+id/trip_card"
+        android:layout_width="290dp"
+        android:layout_height="123dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/bg_sq_white"
+        android:elevation="4dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tripText"
+        android:layout_width="wrap_content"
+        android:layout_height="19dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="9dp"
+        android:fontFamily="@font/proximanova_extrabold"
+        android:gravity="center"
+        android:text="@string/trip_route_p"
+        android:textAppearance="@style/iowa_state_"
+        android:translationZ="5dp"
+        app:layout_constraintEnd_toEndOf="@+id/trip_card"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="@+id/trip_card"
+        app:layout_constraintTop_toTopOf="@+id/trip_card" />
+
+    <View
+        android:id="@+id/line_1"
+        android:layout_width="265dp"
+        android:layout_height="1dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="2dp"
+        android:translationZ="5dp"
+        android:background="@drawable/thin_line"
+        app:layout_constraintEnd_toEndOf="@+id/trip_card"
+        app:layout_constraintStart_toStartOf="@+id/trip_card"
+        app:layout_constraintTop_toBottomOf="@+id/tripText" />
+
+    <View
+        android:id="@+id/line_2"
+        android:layout_width="265dp"
+        android:layout_height="1dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="59dp"
+        android:background="@drawable/thin_line"
+        android:translationZ="5dp"
+        app:layout_constraintEnd_toEndOf="@+id/trip_card"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="@+id/trip_card"
+        app:layout_constraintTop_toBottomOf="@+id/line_1" />
+
+    <TextView
+        android:id="@+id/am_cst"
+        android:layout_width="wrap_content"
+        android:layout_height="12dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="2dp"
+        android:fontFamily="@font/proximanova_bold"
+        android:gravity="top"
+        android:text="@string/trip_time_p"
+        android:textAppearance="@style/date_time"
+        android:translationZ="5dp"
+        app:layout_constraintStart_toStartOf="@+id/trip_card"
+        app:layout_constraintTop_toBottomOf="@+id/line_1" />
+
+    <View
+        android:id="@+id/location_dot"
+        android:layout_width="8.5dp"
+        android:layout_height="12dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="13dp"
+        android:layout_marginTop="13dp"
+        android:background="@drawable/icon_location"
+        android:translationZ="5dp"
+        app:layout_constraintStart_toStartOf="@+id/trip_card"
+        app:layout_constraintTop_toBottomOf="@+id/am_cst" />
+
+    <View
+        android:id="@+id/car_seats"
+        android:layout_width="13dp"
+        android:layout_height="13dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="2dp"
+        android:background="@drawable/icon_car_solid"
+        android:translationZ="5dp"
+        app:layout_constraintStart_toStartOf="@+id/trip_card"
+        app:layout_constraintTop_toBottomOf="@+id/location_dot" />
+
+    <TextView
+        android:id="@+id/pick_up_tbd"
+        android:layout_width="wrap_content"
+        android:layout_height="12dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="3dp"
+        android:layout_marginTop="13dp"
+        android:fontFamily="@font/proximanova_bold"
+        android:gravity="start"
+        android:text="@string/trip_pickup_p"
+        android:textAppearance="@style/pick_up"
+        android:translationZ="5dp"
+        app:layout_constraintStart_toEndOf="@+id/location_dot"
+        app:layout_constraintTop_toBottomOf="@+id/am_cst" />
+
+    <TextView
+        android:id="@+id/seats_avail"
+        android:layout_width="wrap_content"
+        android:layout_height="12dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="2dp"
+        android:fontFamily="@font/proximanova_bold"
+        android:gravity="start"
+        android:text="@string/trip_seats_p"
+        android:textAppearance="@style/seats_avail"
+        android:translationZ="5dp"
+        app:layout_constraintStart_toEndOf="@+id/car_seats"
+        app:layout_constraintTop_toBottomOf="@+id/pick_up_tbd" />
+
+    <View
+        android:id="@+id/price"
+        android:layout_width="49dp"
+        android:layout_height="19dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="3dp"
+        android:layout_marginEnd="12dp"
+        android:background="@drawable/btn_red_square"
+        android:translationZ="5dp"
+        app:layout_constraintEnd_toEndOf="@+id/trip_card"
+        app:layout_constraintTop_toBottomOf="@+id/line_1" />
+
+    <View
+        android:id="@+id/user"
+        android:layout_width="8dp"
+        android:layout_height="10dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginEnd="7dp"
+        android:background="@drawable/icon_user"
+        android:translationZ="5dp"
+        app:layout_constraintBottom_toBottomOf="@+id/price"
+        app:layout_constraintEnd_toEndOf="@+id/price"
+        app:layout_constraintTop_toTopOf="@+id/price" />
+
+    <TextView
+        android:id="@+id/priceText"
+        android:layout_width="wrap_content"
+        android:layout_height="10dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="7dp"
+        android:fontFamily="@font/proximanova_extrabold"
+        android:gravity="start"
+        android:text="@string/trip_price_p"
+        android:textAppearance="@style/price_style"
+        android:translationZ="5dp"
+        app:layout_constraintBottom_toBottomOf="@+id/price"
+        app:layout_constraintStart_toStartOf="@+id/price"
+        app:layout_constraintTop_toTopOf="@+id/price" />
+
+    <View
+        android:id="@+id/roundTrip"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="52dp"
+        android:background="@drawable/icon_round_trip"
+        android:translationZ="5dp"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="@+id/trip_card"
+        app:layout_constraintTop_toBottomOf="@+id/price" />
+
+    <View
+        android:id="@+id/oneWay"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="53dp"
+        android:background="@drawable/icon_one_way"
+        android:translationZ="5dp"
+        app:layout_constraintEnd_toEndOf="@+id/trip_card"
+        app:layout_constraintTop_toBottomOf="@+id/price" />
+
+    <TextView
+        android:id="@+id/round_trip"
+        android:visibility="invisible"
+        android:layout_width="wrap_content"
+        android:layout_height="10dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="5dp"
+        android:fontFamily="@font/proximanova_extrabold"
+        android:gravity="start"
+        android:text="@string/trip_roundtrip"
+        android:textAppearance="@style/trip_type"
+        android:translationZ="5dp"
+        app:layout_constraintStart_toEndOf="@+id/roundTrip"
+        app:layout_constraintTop_toBottomOf="@+id/price" />
+
+    <TextView
+        android:id="@+id/oneway_trip"
+        android:layout_width="wrap_content"
+        android:layout_height="10dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="5dp"
+        android:fontFamily="@font/proximanova_extrabold"
+        android:gravity="start"
+        android:text="@string/trip_oneway"
+        android:textAppearance="@style/trip_type"
+        android:translationZ="5dp"
+        app:layout_constraintStart_toEndOf="@+id/oneWay"
+        app:layout_constraintTop_toBottomOf="@+id/price" />
+
+    <View
+        android:id="@+id/noSmoke"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="3dp"
+        android:layout_marginEnd="52dp"
+        android:background="@drawable/icon_no_smoke"
+        android:translationZ="5dp"
+        app:layout_constraintEnd_toEndOf="@+id/trip_card"
+        app:layout_constraintTop_toBottomOf="@+id/roundTrip" />
+
+    <TextView
+        android:id="@+id/nosmoke_text"
+        android:layout_width="wrap_content"
+        android:layout_height="10dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="3dp"
+        android:fontFamily="@font/proximanova_extrabold"
+        android:gravity="start"
+        android:text="@string/trip_nosmoking"
+        android:textAppearance="@style/trip_type"
+        android:translationZ="5dp"
+        app:layout_constraintStart_toEndOf="@+id/noSmoke"
+        app:layout_constraintTop_toBottomOf="@+id/round_trip" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnEdit"
+        android:layout_width="45dp"
+        android:layout_height="15dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/btn_red_square"
+        android:fontFamily="@font/proximanova_extrabold"
+        android:text="@string/trip_edit"
+        android:textColor="#FFFFFF"
+        android:textSize="12sp"
+        android:translationZ="5dp"
+        android:elevation="5dp"
+        app:layout_constraintBottom_toBottomOf="@+id/trip_card"
+        app:layout_constraintEnd_toEndOf="@+id/trip_card"
+        app:layout_constraintStart_toStartOf="@+id/trip_card" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnDelete"
+        android:layout_width="60dp"
+        android:layout_height="15dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/btn_red_square"
+        android:fontFamily="@font/proximanova_extrabold"
+        android:text="@string/trip_delete"
+        android:textColor="#FFFFFF"
+        android:textSize="12sp"
+        android:translationZ="5dp"
+        android:elevation="5dp"
+        app:layout_constraintBottom_toBottomOf="@+id/trip_card"
+        app:layout_constraintEnd_toEndOf="@+id/trip_card"
+        app:layout_constraintHorizontal_bias="0.102"
+        app:layout_constraintStart_toStartOf="@+id/trip_card" />
+
+    <ImageView
+        android:id="@+id/driver_pic"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:background="@drawable/circle_outline"
+        android:contentDescription="@string/driver_pfp_d"
+        android:translationZ="5dp"
+        app:layout_constraintBottom_toBottomOf="@id/trip_card"
+        android:layout_marginBottom="4dp"
+        app:layout_constraintEnd_toStartOf="@id/driver_name"
+        android:layout_marginEnd="8dp"
+    />
+
+    <TextView
+        android:id="@+id/driver_name"
+        android:layout_width="wrap_content"
+        android:layout_height="24dp"
+        android:fontFamily="@font/proximanova_extrabold"
+        android:text="@string/trip_driver_p"
+        android:textAppearance="@style/iowa_state_"
+        android:translationZ="5dp"
+        app:layout_constraintBottom_toBottomOf="@id/trip_card"
+        android:layout_marginBottom="2dp"
+        app:layout_constraintEnd_toStartOf="@id/messageBtn"
+        android:layout_marginEnd="4dp"
+        />
+
+    <View
+        android:id="@+id/messageBtn"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/icon_paper_plane"
+        android:translationZ="5dp"
+        app:layout_constraintBottom_toBottomOf="@+id/trip_card"
+        app:layout_constraintEnd_toEndOf="@+id/trip_card" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

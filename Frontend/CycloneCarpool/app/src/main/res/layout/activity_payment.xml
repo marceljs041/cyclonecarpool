@@ -1,0 +1,57 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Initiate Payment"
+        android:textSize="32sp"
+        android:fontFamily="@font/proximanova_extrabold"
+        android:layout_gravity="center"
+        android:paddingBottom="16dp" />
+
+    <EditText
+        android:id="@+id/amount_input"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="13dp"
+        android:background="@drawable/btn_gray_square"
+        android:ems="10"
+        android:fontFamily="@font/proximanova_extrabold"
+        android:hint="Amount"
+        android:inputType="numberDecimal"
+        android:paddingLeft="13dp"
+        android:textColorHint="#80FFFFFF"
+        android:textColor="#FFFFFF"
+        android:textSize="24sp" />
+
+    <EditText
+        android:id="@+id/trip_id_input"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="13dp"
+        android:background="@drawable/btn_gray_square"
+        android:ems="10"
+        android:fontFamily="@font/proximanova_extrabold"
+        android:hint="Trip ID"
+        android:inputType="number"
+        android:paddingLeft="13dp"
+        android:textColorHint="#80FFFFFF"
+        android:textColor="#FFFFFF"
+        android:textSize="24sp" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/initiate_payment_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="13dp"
+        android:text="Pay"
+        android:background="@drawable/rounded_button"
+        android:textColor="#FFFFFF"
+        android:fontFamily="@font/proximanova_extrabold"
+        android:textSize="24sp" />
+</LinearLayout>

@@ -1,0 +1,487 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TripInfoPage.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debug</a> &gt; <a href="index.source.html" class="el_package">com.example.cyclonecarpool.trips</a> &gt; <span class="el_source">TripInfoPage.java</span></div><h1>TripInfoPage.java</h1><pre class="source lang-java linenums">package com.example.cyclonecarpool.trips;
+
+import android.content.Intent;
+import android.graphics.Color;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.android.volley.Request;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+import com.example.cyclonecarpool.chat.ChatItem;
+import com.example.cyclonecarpool.chat.MessagingPage;
+import com.example.cyclonecarpool.reviews.ReviewPage;
+import com.example.cyclonecarpool.user.User;
+import com.example.cyclonecarpool.utils.API;
+import com.example.cyclonecarpool.utils.CircleBorderTransform;
+import com.example.cyclonecarpool.HomePage;
+import com.example.cyclonecarpool.R;
+import com.example.cyclonecarpool.chat.ChatsPage;
+import com.example.cyclonecarpool.user.ProfilePage;
+import com.example.cyclonecarpool.utils.ImageHelper;
+import com.example.cyclonecarpool.utils.VolleySingleton;
+import com.google.gson.Gson;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+/**
+ * The TripInfoPage class represents the activity for displaying detailed information about a trip.
+ * This includes information about the driver and passengers, such as their names and ratings.
+ * This activity is also where the user can request to join the trip and where the driver can
+ * confirm or deny the request.
+ *
+ * @author Tyler Gorton
+ */
+<span class="nc" id="L62">public class TripInfoPage extends AppCompatActivity {</span>
+
+<span class="nc" id="L64">    public String role = null;</span>
+<span class="nc" id="L65">    public Integer userId = null;</span>
+
+    private Integer tripId;
+    private TripItem trip;
+    private Long driverId;
+    private User driver;
+    private List&lt;User&gt; passengers;
+
+    private LinearLayout passengerContainer;
+    private ImageView profileBtn;
+    private Button joinButton;
+
+<span class="nc" id="L77">    Gson gson = new Gson();</span>
+
+    /**
+     * Performs initialization tasks when the activity is created. Sets up UI elements and event
+     * listeners and then calls helper methods to fetch information about the trip and driver from
+     * the server.
+     *
+     * @param savedInstanceState The saved instance state of the activity.
+     */
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+<span class="nc" id="L88">        super.onCreate(savedInstanceState);</span>
+
+<span class="nc" id="L90">        requestWindowFeature(Window.FEATURE_NO_TITLE);</span>
+<span class="nc" id="L91">        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);</span>
+<span class="nc" id="L92">        getSupportActionBar().hide();</span>
+
+<span class="nc" id="L94">        Intent intent = getIntent();</span>
+<span class="nc bnc" id="L95" title="All 6 branches missed.">        if (intent != null &amp;&amp; intent.hasExtra(&quot;userId&quot;) &amp;&amp; intent.hasExtra(&quot;role&quot;)) {</span>
+<span class="nc" id="L96">            int userId = intent.getIntExtra(&quot;userId&quot;, -1); // Default to -1 if not found</span>
+<span class="nc" id="L97">            String role = intent.getStringExtra(&quot;role&quot;);</span>
+
+            // Set the userId and role in HomePage
+<span class="nc" id="L100">            this.userId = userId;</span>
+<span class="nc" id="L101">            this.role = role;</span>
+<span class="nc bnc" id="L102" title="All 2 branches missed.">            if (intent.hasExtra(&quot;tripId&quot;)) {</span>
+<span class="nc" id="L103">                this.tripId = intent.getIntExtra(&quot;tripId&quot;, -1);</span>
+            }
+<span class="nc bnc" id="L105" title="All 2 branches missed.">            if (intent.hasExtra(&quot;driverId&quot;)) {</span>
+<span class="nc" id="L106">                this.driverId = (long) intent.getIntExtra(&quot;driverId&quot;, -1);</span>
+            }
+        }
+
+<span class="nc" id="L110">        setContentView(R.layout.trip_info_screen);</span>
+
+<span class="nc" id="L112">        passengerContainer = findViewById(R.id.passenger_Container);</span>
+
+<span class="nc" id="L114">        Button reviewButton = findViewById(R.id.btn_trip_review);</span>
+<span class="nc" id="L115">        reviewButton.setOnClickListener(view -&gt; {</span>
+<span class="nc" id="L116">            Intent reviewIntent = new Intent(this, ReviewPage.class);</span>
+<span class="nc" id="L117">            reviewIntent.putExtra(&quot;tripId&quot;, tripId);</span>
+<span class="nc" id="L118">            reviewIntent.putExtra(&quot;userId&quot;, userId);</span>
+<span class="nc" id="L119">            reviewIntent.putExtra(&quot;role&quot;, role);</span>
+<span class="nc" id="L120">            startActivity(reviewIntent);</span>
+<span class="nc" id="L121">        });</span>
+
+<span class="nc" id="L123">        joinButton = findViewById(R.id.btn_trip_join);</span>
+<span class="nc" id="L124">        joinButton.setOnClickListener(view -&gt; joinTrip());</span>
+
+<span class="nc" id="L126">        Button homeNavBtn = findViewById(R.id.house_navBtn);</span>
+<span class="nc" id="L127">        Button tripsNavBtn = findViewById(R.id.trips_navBtn);</span>
+<span class="nc" id="L128">        Button createTripBtn = findViewById(R.id.btnCreate);</span>
+<span class="nc" id="L129">        Button messagesTripBtn = findViewById(R.id.messages_navBtn);</span>
+<span class="nc" id="L130">        profileBtn = findViewById(R.id.profileBtn);</span>
+
+<span class="nc" id="L132">        homeNavBtn.setOnClickListener(view -&gt; {</span>
+<span class="nc" id="L133">            Intent homeIntent = new Intent(this, HomePage.class);</span>
+<span class="nc" id="L134">            homeIntent.putExtra(&quot;userId&quot;, userId);</span>
+<span class="nc" id="L135">            homeIntent.putExtra(&quot;role&quot;, role);</span>
+<span class="nc" id="L136">            startActivity(homeIntent);</span>
+<span class="nc" id="L137">        });</span>
+<span class="nc" id="L138">        tripsNavBtn.setOnClickListener(view -&gt; {</span>
+<span class="nc" id="L139">            Intent tripsIntent = new Intent(this, MyTripPage.class);</span>
+<span class="nc" id="L140">            tripsIntent.putExtra(&quot;userId&quot;, userId);</span>
+<span class="nc" id="L141">            tripsIntent.putExtra(&quot;role&quot;, role);</span>
+<span class="nc" id="L142">            startActivity(tripsIntent);</span>
+<span class="nc" id="L143">        });</span>
+<span class="nc" id="L144">        createTripBtn.setOnClickListener(view -&gt; {</span>
+<span class="nc" id="L145">            Intent createIntent = new Intent(this, CreateTripPage.class);</span>
+<span class="nc" id="L146">            createIntent.putExtra(&quot;userId&quot;, userId);</span>
+<span class="nc" id="L147">            createIntent.putExtra(&quot;role&quot;, role);</span>
+<span class="nc" id="L148">            startActivity(createIntent);</span>
+<span class="nc" id="L149">        });</span>
+<span class="nc" id="L150">        messagesTripBtn.setOnClickListener(view -&gt; {</span>
+<span class="nc" id="L151">            Intent msgIntent = new Intent(this, ChatsPage.class);</span>
+<span class="nc" id="L152">            msgIntent.putExtra(&quot;userId&quot;, userId);</span>
+<span class="nc" id="L153">            msgIntent.putExtra(&quot;role&quot;, role);</span>
+<span class="nc" id="L154">            startActivity(msgIntent);</span>
+<span class="nc" id="L155">        });</span>
+<span class="nc" id="L156">        profileBtn.setOnClickListener(view -&gt; {</span>
+<span class="nc" id="L157">            Intent profileIntent = new Intent(this, ProfilePage.class);</span>
+<span class="nc" id="L158">            profileIntent.putExtra(&quot;userId&quot;, userId);</span>
+<span class="nc" id="L159">            profileIntent.putExtra(&quot;role&quot;, role);</span>
+<span class="nc" id="L160">            startActivity(profileIntent);</span>
+<span class="nc" id="L161">        });</span>
+
+<span class="nc" id="L163">        makeProfilePicReq();</span>
+<span class="nc" id="L164">        reqTrip();</span>
+<span class="nc" id="L165">        reqDriver();</span>
+<span class="nc" id="L166">    }</span>
+
+    /**
+     * Fetches trip information from the server. Uses Volley to make the request and calls helper
+     * methods in the response handler to parse the JSON response and populate the UI.
+     */
+    private void reqTrip() {
+<span class="nc" id="L173">        JsonObjectRequest tripRequest = new JsonObjectRequest(</span>
+                Request.Method.GET,
+                API.TRIP_URL + tripId,
+                null,
+                response -&gt; {
+<span class="nc" id="L178">                    Log.d(&quot;Trip Info Request&quot;, &quot;Response: &quot; + response.toString());</span>
+                    try {
+<span class="nc" id="L180">                        trip = parseTripJson(response);</span>
+<span class="nc" id="L181">                        populateTripInfo();</span>
+<span class="nc" id="L182">                    } catch (Exception e) {</span>
+<span class="nc" id="L183">                        throw new RuntimeException(e);</span>
+<span class="nc" id="L184">                    }</span>
+                    try {
+<span class="nc" id="L186">                        JSONArray passengersArray = response.getJSONArray(&quot;passengers&quot;);</span>
+<span class="nc" id="L187">                        passengers = parsePassengersJson(passengersArray);</span>
+<span class="nc" id="L188">                        populatePassengerContainer();</span>
+<span class="nc" id="L189">                    } catch (Exception e) {</span>
+<span class="nc" id="L190">                        throw new RuntimeException(e);</span>
+<span class="nc" id="L191">                    }</span>
+<span class="nc" id="L192">                },</span>
+                error -&gt; {
+<span class="nc" id="L194">                    Log.e(&quot;Trip Info Request&quot;, &quot;Error fetching trip&quot;, error);</span>
+<span class="nc" id="L195">                    Toast.makeText(TripInfoPage.this, &quot;Error fetching trip&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc" id="L196">                }</span>
+        );
+<span class="nc" id="L198">        VolleySingleton.getInstance(this).addToRequestQueue(tripRequest);</span>
+<span class="nc" id="L199">    }</span>
+
+    /**
+     * Parses a JSON object representing a trip and returns a TripItem object.
+     *
+     * @param tripJson The JSON object representing the trip.
+     * @return a TripItem object containing the trip details.
+     * @throws JSONException If the JSON object does not contain one or more of the required fields.
+     */
+    private TripItem parseTripJson(JSONObject tripJson) throws JSONException {
+<span class="nc" id="L209">        long tripId = tripJson.getLong(&quot;tripId&quot;);</span>
+<span class="nc" id="L210">        long driverId = tripJson.getLong(&quot;driverId&quot;);</span>
+<span class="nc" id="L211">        String startLocation = tripJson.getString(&quot;startLocation&quot;);</span>
+<span class="nc" id="L212">        String endLocation = tripJson.getString(&quot;endLocation&quot;);</span>
+<span class="nc" id="L213">        String pickUp = tripJson.getString(&quot;pickUp&quot;);</span>
+<span class="nc" id="L214">        String time = tripJson.getString(&quot;time&quot;);</span>
+<span class="nc" id="L215">        int seat = tripJson.getInt(&quot;seat&quot;);</span>
+<span class="nc" id="L216">        int price = tripJson.getInt(&quot;price&quot;);</span>
+<span class="nc" id="L217">        boolean roundTrip = tripJson.getBoolean(&quot;roundTrip&quot;);</span>
+<span class="nc" id="L218">        boolean noSmoke = tripJson.getBoolean(&quot;noSmoke&quot;);</span>
+
+<span class="nc" id="L220">        TripItem trip = new TripItem(</span>
+<span class="nc" id="L221">                (int) tripId, startLocation, endLocation, time, pickUp, (int) driverId, seat, price, roundTrip, noSmoke</span>
+        );
+
+<span class="nc" id="L224">        return trip;</span>
+    }
+
+    /**
+     * Populates the UI with the trip details. Uses the &lt;code&gt;trip&lt;/code&gt; class variable to access
+     * the trip information instead of taking a parameter.
+     */
+    private void populateTripInfo() {
+<span class="nc" id="L232">        TextView tripText = findViewById(R.id.tripText);</span>
+<span class="nc" id="L233">        TextView dateTime = findViewById(R.id.am_cst);</span>
+<span class="nc" id="L234">        TextView pickUpLoco = findViewById(R.id.pick_up_tbd);</span>
+<span class="nc" id="L235">        TextView seatsAvailable = findViewById(R.id.seats_avail);</span>
+<span class="nc" id="L236">        TextView priceText = findViewById(R.id.priceText);</span>
+<span class="nc" id="L237">        View roundTripIcon = findViewById(R.id.roundTrip);</span>
+<span class="nc" id="L238">        TextView roundTripText = findViewById(R.id.round_trip);</span>
+<span class="nc" id="L239">        View oneWayIcon = findViewById(R.id.oneWay);</span>
+<span class="nc" id="L240">        TextView oneWayText = findViewById(R.id.oneway_trip);</span>
+<span class="nc" id="L241">        View noSmokeIcon = findViewById(R.id.noSmoke);</span>
+<span class="nc" id="L242">        TextView noSmokeText = findViewById(R.id.nosmoke_text);</span>
+
+<span class="nc" id="L244">        String dateTimeStr = trip.getDateTime();</span>
+<span class="nc" id="L245">        String[] parts = dateTimeStr.split(&quot;T&quot;);</span>
+
+<span class="nc bnc" id="L247" title="All 2 branches missed.">        if (parts.length &lt; 2) {</span>
+<span class="nc" id="L248">            Log.e(&quot;DateTime Parsing&quot;, &quot;Unexpected dateTime format: &quot; + dateTimeStr);</span>
+<span class="nc" id="L249">            return;</span>
+        }
+
+<span class="nc" id="L252">        String date = parts[0];  // Date part &quot;yyyy-MM-dd&quot;</span>
+<span class="nc" id="L253">        String time24 = parts[1];  // Time part &quot;HH:mm:ss&quot;</span>
+
+        // Split the time part and convert to 12-hour format
+<span class="nc" id="L256">        String[] timeParts = time24.split(&quot;:&quot;);</span>
+<span class="nc" id="L257">        int hour = Integer.parseInt(timeParts[0]);</span>
+<span class="nc" id="L258">        int minute = Integer.parseInt(timeParts[1]);</span>
+<span class="nc bnc" id="L259" title="All 2 branches missed.">        String amPm = (hour &gt;= 12) ? &quot;PM&quot; : &quot;AM&quot;;</span>
+<span class="nc bnc" id="L260" title="All 4 branches missed.">        hour = (hour == 0) ? 12 : (hour &gt; 12) ? hour - 12 : hour;</span>
+<span class="nc" id="L261">        String time12 = String.format(&quot;%02d:%02d %s&quot;, hour, minute, amPm);</span>
+
+
+<span class="nc" id="L264">        tripText.setText(trip.getToLoco() + &quot; -&gt; &quot; + trip.getFromLoco());</span>
+<span class="nc" id="L265">        dateTime.setText(date + &quot; @ &quot; + time12);</span>
+<span class="nc" id="L266">        pickUpLoco.setText(&quot;Pick Up: &quot; + trip.getPickUpLoco());</span>
+<span class="nc" id="L267">        seatsAvailable.setText(trip.getSeatsAvailable() + &quot; Seats Available&quot;);</span>
+<span class="nc" id="L268">        priceText.setText(&quot;$&quot; + trip.getPrice() + &quot; /&quot;);</span>
+
+        // Handle visibility for round trip and one-way
+<span class="nc bnc" id="L271" title="All 2 branches missed.">        if (trip.getRoundTrip()) {</span>
+            // Show round trip, hide one-way
+<span class="nc" id="L273">            roundTripIcon.setVisibility(View.VISIBLE);</span>
+<span class="nc" id="L274">            roundTripText.setVisibility(View.VISIBLE);</span>
+<span class="nc" id="L275">            oneWayIcon.setVisibility(View.INVISIBLE);</span>
+<span class="nc" id="L276">            oneWayText.setVisibility(View.INVISIBLE);</span>
+        } else {
+            // Show one-way, hide round trip
+<span class="nc" id="L279">            roundTripIcon.setVisibility(View.INVISIBLE);</span>
+<span class="nc" id="L280">            roundTripText.setVisibility(View.INVISIBLE);</span>
+<span class="nc" id="L281">            oneWayIcon.setVisibility(View.VISIBLE);</span>
+<span class="nc" id="L282">            oneWayText.setVisibility(View.VISIBLE);</span>
+        }
+
+        // Handle visibility for no smoking
+<span class="nc bnc" id="L286" title="All 2 branches missed.">        if (trip.getNoSmoke()) {</span>
+<span class="nc" id="L287">            noSmokeIcon.setVisibility(View.VISIBLE);</span>
+<span class="nc" id="L288">            noSmokeText.setVisibility(View.VISIBLE);</span>
+        } else {
+<span class="nc" id="L290">            noSmokeIcon.setVisibility(View.INVISIBLE);</span>
+<span class="nc" id="L291">            noSmokeText.setVisibility(View.INVISIBLE);</span>
+        }
+<span class="nc" id="L293">    }</span>
+
+    /**
+     * Parses a JSON array of passengers and returns a list of User objects.
+     *
+     * @param passengersArray The JSON array representing the passengers.
+     * @return a list of User objects representing the passengers.
+     * @throws JSONException If any of the objects in the JSONArray do not contain the required fields.
+     */
+    private List&lt;User&gt; parsePassengersJson(JSONArray passengersArray) throws JSONException {
+<span class="nc" id="L303">        List&lt;User&gt; passengers = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L304" title="All 2 branches missed.">        for (int i = 0; i &lt; passengersArray.length(); i++) {</span>
+<span class="nc" id="L305">            JSONObject passengerJson = passengersArray.getJSONObject(i);</span>
+<span class="nc" id="L306">            User passenger = gson.fromJson(passengerJson.toString(), User.class);</span>
+<span class="nc" id="L307">            passengers.add(passenger);</span>
+        }
+<span class="nc" id="L309">        return passengers;</span>
+    }
+
+    /**
+     * Populates the UI with the list of passengers. Uses the &lt;code&gt;passengers&lt;/code&gt; class variable
+     * to access the passenger information instead of taking a parameter.
+     */
+    private void populatePassengerContainer() {
+<span class="nc" id="L317">        passengerContainer.removeAllViews();</span>
+<span class="nc bnc" id="L318" title="All 2 branches missed.">        for (User user : passengers) {</span>
+<span class="nc" id="L319">            View profileView = LayoutInflater.from(this)</span>
+<span class="nc" id="L320">                    .inflate(R.layout.profile_card, passengerContainer, false);</span>
+
+<span class="nc" id="L322">            ImageView userImage = profileView.findViewById(R.id.user_image);</span>
+<span class="nc" id="L323">            TextView chatName = profileView.findViewById(R.id.user_name);</span>
+<span class="nc" id="L324">            TextView userRating = profileView.findViewById(R.id.user_rating_text);</span>
+
+<span class="nc" id="L326">            String otherUserName = user.getFirstname() + &quot; &quot; + user.getLastname();</span>
+<span class="nc" id="L327">            chatName.setText(otherUserName);</span>
+
+<span class="nc" id="L329">            fetchUserRating(user.getIntId(), userRating);</span>
+
+<span class="nc" id="L331">            ImageHelper.loadProfilePic(this, user.getProfilePicture(), userImage);</span>
+
+<span class="nc" id="L333">            passengerContainer.addView(profileView);</span>
+<span class="nc" id="L334">        }</span>
+<span class="nc" id="L335">    }</span>
+
+    /**
+     * Fetches driver information from the server. Uses Volley to make the request and calls a
+     * helper method in the response handler to populate the UI with the driver information.
+     */
+    private void reqDriver() {
+<span class="nc" id="L342">        JsonObjectRequest driverRequest = new JsonObjectRequest(</span>
+                Request.Method.GET,
+                API.USER_URL + driverId,
+                null,
+                response -&gt; {
+<span class="nc" id="L347">                    Log.d(&quot;Driver Info Request&quot;, &quot;Response: &quot; + response.toString());</span>
+                    try {
+<span class="nc" id="L349">                        driver = gson.fromJson(response.toString(), User.class);</span>
+<span class="nc" id="L350">                        populateDriverInfo();</span>
+<span class="nc" id="L351">                    } catch (Exception e) {</span>
+<span class="nc" id="L352">                        throw new RuntimeException(e);</span>
+<span class="nc" id="L353">                    }</span>
+<span class="nc" id="L354">                },</span>
+                error -&gt; {
+<span class="nc" id="L356">                    Log.e(&quot;Driver Info Request&quot;, &quot;Error fetching driver&quot;, error);</span>
+<span class="nc" id="L357">                    Toast.makeText(TripInfoPage.this, &quot;Error fetching driver&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc" id="L358">                }</span>
+        );
+<span class="nc" id="L360">        VolleySingleton.getInstance(this).addToRequestQueue(driverRequest);</span>
+<span class="nc" id="L361">    }</span>
+
+    /**
+     * Populates the UI with the driver information. Uses the &lt;code&gt;driver&lt;/code&gt; class variable
+     * to access the driver information instead of taking a parameter.
+     */
+    private void populateDriverInfo() {
+<span class="nc" id="L368">        ImageView driverImage = findViewById(R.id.driver_image);</span>
+<span class="nc" id="L369">        TextView driverName = findViewById(R.id.driver_name);</span>
+<span class="nc" id="L370">        TextView driverRating = findViewById(R.id.driver_rating_text);</span>
+
+<span class="nc" id="L372">        driverName.setText(driver.getFullName());</span>
+
+<span class="nc" id="L374">        fetchUserRating(driver.getIntId(), driverRating);</span>
+
+<span class="nc" id="L376">        ImageHelper.loadProfilePic(this, driver.getProfilePicture(), driverImage);</span>
+<span class="nc" id="L377">    }</span>
+
+    /**
+     * Fetches a user's average rating from the server. Uses Volley to make the request. Takes the
+     * ID of the user and the TextView in which to display the rating as parameters.
+     *
+     * @param userId        The ID of the user to fetch the rating for.
+     * @param ratingText    The TextView in which to display the rating.
+     */
+    private void fetchUserRating(Integer userId, TextView ratingText) {
+<span class="nc" id="L387">        StringRequest ratingRequest = new StringRequest(</span>
+                Request.Method.GET,
+                API.USER_URL + userId + &quot;/review&quot;,
+                response -&gt; {
+<span class="nc" id="L391">                    double rating = Double.parseDouble(response);</span>
+<span class="nc" id="L392">                    ratingText.setText(String.valueOf(rating));</span>
+<span class="nc" id="L393">                },</span>
+                error -&gt; {
+<span class="nc bnc" id="L395" title="All 6 branches missed.">                    if (error != null &amp;&amp; error.networkResponse != null &amp;&amp; error.networkResponse.statusCode == 404) {</span>
+<span class="nc" id="L396">                        ratingText.setText(&quot;---&quot;);</span>
+                    } else {
+<span class="nc" id="L398">                        Log.e(&quot;Rating Request&quot;, &quot;Error fetching rating&quot;, error);</span>
+<span class="nc" id="L399">                        Toast.makeText(TripInfoPage.this, &quot;Error fetching rating&quot;, Toast.LENGTH_SHORT).show();</span>
+                    }
+<span class="nc" id="L401">                }</span>
+        );
+<span class="nc" id="L403">        VolleySingleton.getInstance(this).addToRequestQueue(ratingRequest);</span>
+<span class="nc" id="L404">    }</span>
+
+    /**
+     * Attempts to add the current user to the trip. Uses Volley to make the request. References
+     * the &lt;code&gt;tripId&lt;/code&gt; and &lt;code&gt;userId&lt;/code&gt; class variables, so takes no parameters.
+     * Assigns the &lt;code&gt;trip&lt;/code&gt; and &lt;code&gt;passengers&lt;/code&gt; class variables and calls
+     * helper methods to populate the UI with the updated information.
+     */
+    private void joinTrip() {
+<span class="nc" id="L413">        JsonObjectRequest joinTripRequest = new JsonObjectRequest(</span>
+                Request.Method.POST,
+                API.TRIP_URL + tripId + &quot;/join&quot;,
+                null,
+                response -&gt; {
+<span class="nc" id="L418">                    Log.d(&quot;Join Trip Request&quot;, &quot;Response: &quot; + response.toString());</span>
+<span class="nc" id="L419">                    Trip tripObject = gson.fromJson(response.toString(), Trip.class);</span>
+<span class="nc" id="L420">                    trip = tripObject.toTripItem();</span>
+<span class="nc" id="L421">                    populateTripInfo();</span>
+<span class="nc" id="L422">                    passengers = tripObject.getPassengers();</span>
+<span class="nc" id="L423">                    populatePassengerContainer();</span>
+<span class="nc" id="L424">                    joinButton.setVisibility(View.GONE);</span>
+<span class="nc" id="L425">                },</span>
+                error -&gt; {
+<span class="nc" id="L427">                    Log.e(&quot;Join Trip Request&quot;, &quot;Error: &quot; + error.toString());</span>
+<span class="nc" id="L428">                }</span>
+<span class="nc" id="L429">        ) {</span>
+            @Override
+            public Map&lt;String, String&gt; getHeaders() {
+<span class="nc" id="L432">                Map&lt;String, String&gt; headers = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L433">                headers.put(&quot;Content-Type&quot;, &quot;application/json&quot;);</span>
+<span class="nc" id="L434">                headers.put(&quot;Accept&quot;, &quot;application/json&quot;);</span>
+<span class="nc" id="L435">                return headers;</span>
+            }
+            @Override
+            public byte[] getBody() {
+<span class="nc" id="L439">                JSONObject body = new JSONObject();</span>
+                try {
+<span class="nc" id="L441">                    body.put(&quot;userId&quot;, userId);</span>
+<span class="nc" id="L442">                } catch (JSONException e) {</span>
+<span class="nc" id="L443">                    throw new RuntimeException(e);</span>
+<span class="nc" id="L444">                }</span>
+<span class="nc" id="L445">                return body.toString().getBytes(StandardCharsets.UTF_8);</span>
+            }
+        };
+<span class="nc" id="L448">        VolleySingleton.getInstance(this).addToRequestQueue(joinTripRequest);</span>
+<span class="nc" id="L449">    }</span>
+
+    /**
+     * Fetches the user's profile picture URL from the server. Uses standard HTTP methods to make
+     * the request and calls &lt;code&gt;ImageHelper.loadProfilePic&lt;/code&gt; to display the profile picture
+     * in the UI.
+     */
+    private void makeProfilePicReq() {
+<span class="nc" id="L457">        new Thread(() -&gt; {</span>
+            try {
+<span class="nc" id="L459">                URL url = new URL(API.USER_URL + &quot;profilePic/&quot; + userId);</span>
+<span class="nc" id="L460">                HttpURLConnection conn = (HttpURLConnection) url.openConnection();</span>
+<span class="nc" id="L461">                conn.setRequestMethod(&quot;GET&quot;);</span>
+<span class="nc" id="L462">                conn.setConnectTimeout(5000);</span>
+<span class="nc" id="L463">                conn.setReadTimeout(5000);</span>
+
+<span class="nc" id="L465">                int responseCode = conn.getResponseCode();</span>
+<span class="nc bnc" id="L466" title="All 2 branches missed.">                if (responseCode == HttpURLConnection.HTTP_OK) {</span>
+<span class="nc" id="L467">                    BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));</span>
+<span class="nc" id="L468">                    StringBuilder response = new StringBuilder();</span>
+                    String inputLine;
+<span class="nc bnc" id="L470" title="All 2 branches missed.">                    while ((inputLine = in.readLine()) != null) {</span>
+<span class="nc" id="L471">                        response.append(inputLine);</span>
+                    }
+<span class="nc" id="L473">                    in.close();</span>
+
+<span class="nc" id="L475">                    String profilePicUrl = response.toString().trim();</span>
+
+<span class="nc" id="L477">                    runOnUiThread(() -&gt; ImageHelper.loadProfilePic(TripInfoPage.this, profilePicUrl, profileBtn));</span>
+<span class="nc" id="L478">                } else {</span>
+<span class="nc" id="L479">                    Log.e(&quot;HTTP Request&quot;, &quot;Failed to get profile picture. Response Code: &quot; + responseCode);</span>
+                }
+<span class="nc" id="L481">            } catch (Exception e) {</span>
+<span class="nc" id="L482">                Log.e(&quot;HTTP Request&quot;, &quot;Error fetching profile picture&quot;, e);</span>
+<span class="nc" id="L483">            }</span>
+<span class="nc" id="L484">        }).start();</span>
+<span class="nc" id="L485">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span>Generated by the Android Gradle plugin 8.5.2</div></body></html>

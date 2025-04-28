@@ -1,0 +1,422 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF">
+
+<!--    Title    -->
+    <View
+        android:id="@+id/rectangle_3"
+        android:layout_width="match_parent"
+        android:layout_height="49dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:background="#C8102E"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/trips_near_"
+        android:layout_width="216dp"
+        android:layout_height="40dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="4dp"
+        android:fontFamily="@font/proximanova_extrabold"
+        android:lineHeight="39sp"
+        android:gravity="center"
+        android:text="Edit Trip"
+        android:textAppearance="@style/trips_near_"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+<!--    Inside    -->
+
+    <TextView
+        android:id="@+id/from_"
+        android:layout_width="wrap_content"
+        android:layout_height="26dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="36dp"
+        android:layout_marginTop="83dp"
+        android:fontFamily="@font/proximanova_extrabold"
+        android:gravity="center_vertical"
+        android:text="From:"
+        android:textAppearance="@style/input_create"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/rectangle_3" />
+
+    <EditText
+        android:id="@+id/fromEditInput"
+        android:layout_width="260dp"
+        android:layout_height="33.41dp"
+        android:layout_marginStart="6dp"
+        android:layout_marginTop="79dp"
+        android:background="@drawable/btn_white_square"
+        android:elevation="4dp"
+        android:ems="10"
+        android:fontFamily="@font/proximanova_extrabold"
+        android:hint="Type here..."
+        android:inputType="text"
+        android:paddingLeft="10.59dp"
+        android:textColor="#C8102E"
+        android:textColorHint="#68C8102E"
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@+id/from_"
+        app:layout_constraintTop_toBottomOf="@+id/rectangle_3" />
+
+    <TextView
+        android:id="@+id/to_"
+        android:layout_width="wrap_content"
+        android:layout_height="26dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="48dp"
+        android:layout_marginTop="31dp"
+        android:fontFamily="@font/proximanova_extrabold"
+        android:gravity="center_vertical"
+        android:text="To:"
+        android:textAppearance="@style/input_create"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/from_" />
+
+    <EditText
+        android:id="@+id/toEditInput"
+        android:layout_width="280dp"
+        android:layout_height="33.41dp"
+        android:layout_marginStart="6dp"
+        android:layout_marginTop="23dp"
+        android:background="@drawable/btn_white_square"
+        android:elevation="4dp"
+        android:ems="10"
+        android:fontFamily="@font/proximanova_extrabold"
+        android:hint="Type here..."
+        android:inputType="text"
+        android:paddingLeft="10.59dp"
+        android:textColor="#C8102E"
+        android:textColorHint="#68C8102E"
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@+id/to_"
+        app:layout_constraintTop_toBottomOf="@+id/fromEditInput" />
+
+    <TextView
+        android:id="@+id/pickup_"
+        android:layout_width="wrap_content"
+        android:layout_height="26dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="36dp"
+        android:layout_marginTop="31dp"
+        android:fontFamily="@font/proximanova_extrabold"
+        android:gravity="center_vertical"
+        android:text="Pick Up:"
+        android:textAppearance="@style/input_create"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/to_" />
+
+    <EditText
+        android:id="@+id/pickupEditInput"
+        android:layout_width="232dp"
+        android:layout_height="33.41dp"
+        android:layout_marginStart="6dp"
+        android:layout_marginTop="24dp"
+        android:background="@drawable/btn_white_square"
+        android:elevation="4dp"
+        android:ems="10"
+        android:fontFamily="@font/proximanova_extrabold"
+        android:hint="Type here..."
+        android:inputType="text"
+        android:paddingLeft="10.59dp"
+        android:textColor="#C8102E"
+        android:textColorHint="#68C8102E"
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@+id/pickup_"
+        app:layout_constraintTop_toBottomOf="@+id/toEditInput" />
+
+    <TextView
+        android:id="@+id/date_"
+        android:layout_width="wrap_content"
+        android:layout_height="26dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="35dp"
+        android:layout_marginTop="31dp"
+        android:fontFamily="@font/proximanova_extrabold"
+        android:gravity="center_vertical"
+        android:text="Date:"
+        android:textAppearance="@style/input_create"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/pickup_" />
+
+    <EditText
+        android:id="@+id/dateEditInput"
+        android:layout_width="266dp"
+        android:layout_height="33.41dp"
+        android:layout_marginStart="6dp"
+        android:layout_marginTop="23dp"
+        android:background="@drawable/btn_white_square"
+        android:elevation="4dp"
+        android:ems="10"
+        android:fontFamily="@font/proximanova_extrabold"
+        android:hint="xx/xx/xxxx"
+        android:inputType="date"
+        android:paddingLeft="10.59dp"
+        android:textColor="#C8102E"
+        android:textColorHint="#68C8102E"
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@+id/date_"
+        app:layout_constraintTop_toBottomOf="@+id/pickupEditInput" />
+
+    <TextView
+        android:id="@+id/time_"
+        android:layout_width="wrap_content"
+        android:layout_height="26dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="35dp"
+        android:layout_marginTop="31dp"
+        android:fontFamily="@font/proximanova_extrabold"
+        android:gravity="center_vertical"
+        android:text="Time:"
+        android:textAppearance="@style/input_create"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/date_" />
+
+    <EditText
+        android:id="@+id/timeEditInput"
+        android:layout_width="263dp"
+        android:layout_height="33.41dp"
+        android:layout_marginStart="6dp"
+        android:layout_marginTop="23dp"
+        android:background="@drawable/btn_white_square"
+        android:elevation="4dp"
+        android:ems="10"
+        android:fontFamily="@font/proximanova_extrabold"
+        android:hint="00:00"
+        android:inputType="time"
+        android:paddingLeft="10.59dp"
+        android:textColor="#C8102E"
+        android:textColorHint="#68C8102E"
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@+id/time_"
+        app:layout_constraintTop_toBottomOf="@+id/dateEditInput" />
+
+    <TextView
+        android:id="@+id/seats_"
+        android:layout_width="wrap_content"
+        android:layout_height="26dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="35dp"
+        android:layout_marginTop="31dp"
+        android:fontFamily="@font/proximanova_extrabold"
+        android:gravity="center_vertical"
+        android:text="Seats:"
+        android:textAppearance="@style/input_create"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/time_" />
+
+    <EditText
+        android:id="@+id/seatsEditInput"
+        android:layout_width="256dp"
+        android:layout_height="33.41dp"
+        android:layout_marginStart="6dp"
+        android:layout_marginTop="24dp"
+        android:background="@drawable/btn_white_square"
+        android:elevation="4dp"
+        android:ems="10"
+        android:fontFamily="@font/proximanova_extrabold"
+        android:hint="Type here..."
+        android:inputType="number"
+        android:paddingLeft="10.59dp"
+        android:textColor="#C8102E"
+        android:textColorHint="#68C8102E"
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@+id/seats_"
+        app:layout_constraintTop_toBottomOf="@+id/timeEditInput" />
+
+    <TextView
+        android:id="@+id/price_"
+        android:layout_width="wrap_content"
+        android:layout_height="26dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="35dp"
+        android:layout_marginTop="31dp"
+        android:fontFamily="@font/proximanova_extrabold"
+        android:gravity="center_vertical"
+        android:text="Price:"
+        android:textAppearance="@style/input_create"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/seats_" />
+
+    <EditText
+        android:id="@+id/priceEditInput"
+        android:layout_width="260dp"
+        android:layout_height="33.41dp"
+        android:layout_marginStart="6dp"
+        android:layout_marginTop="24dp"
+        android:background="@drawable/btn_white_square"
+        android:elevation="4dp"
+        android:ems="10"
+        android:fontFamily="@font/proximanova_extrabold"
+        android:hint="Type here..."
+        android:inputType="number"
+        android:paddingLeft="10.59dp"
+        android:textColor="#C8102E"
+        android:textColorHint="#68C8102E"
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@+id/price_"
+        app:layout_constraintTop_toBottomOf="@+id/seatsEditInput" />
+
+    <TextView
+        android:id="@+id/additional_"
+        android:layout_width="178dp"
+        android:layout_height="26dp"
+        android:layout_marginStart="110dp"
+        android:layout_marginTop="40dp"
+        android:fontFamily="@font/proximanova_extrabold"
+        android:gravity="center_vertical"
+        android:text="Additional:"
+        android:textAppearance="@style/additional_"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/priceEditInput" />
+
+    <CheckBox
+        android:id="@+id/checkBoxRoundTrip"
+        android:layout_width="wrap_content"
+        android:layout_height="26dp"
+        android:layout_marginStart="110dp"
+        android:layout_marginTop="11dp"
+        android:text="Round Trip"
+        android:fontFamily="@font/proximanova_extrabold"
+        android:checked="false"
+        android:gravity="center"
+        android:textColor="#C8102E"
+        android:textSize="24sp"
+        android:elevation="4dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/additional_" />
+
+    <CheckBox
+        android:id="@+id/checkBoxNoSmoke"
+        android:layout_width="wrap_content"
+        android:layout_height="26dp"
+        android:layout_marginStart="110dp"
+        android:layout_marginTop="11dp"
+        android:checked="false"
+        android:elevation="4dp"
+        android:fontFamily="@font/proximanova_extrabold"
+        android:gravity="center"
+        android:text="No Smoking"
+        android:textColor="#C8102E"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/checkBoxRoundTrip" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnEditTrip"
+        android:layout_width="275dp"
+        android:layout_height="49dp"
+        android:layout_marginTop="60dp"
+        android:background="@drawable/btn_green_square"
+        android:fontFamily="@font/proximanova_extrabold"
+        android:text="Edit"
+        android:textColor="#FFFFFF"
+        android:textSize="34sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/checkBoxNoSmoke" />
+
+    <View
+        android:id="@+id/rectangle_1"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:background="#C8102E"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/house_navBtn"
+        android:layout_width="36dp"
+        android:layout_height="32dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="35dp"
+        android:background="@drawable/icon_home_h"
+        android:backgroundTint="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/rectangle_1" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/trips_navBtn"
+        android:layout_width="36dp"
+        android:layout_height="32dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="23dp"
+        android:background="@drawable/icon_road"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/house_navBtn"
+        app:layout_constraintTop_toTopOf="@+id/rectangle_1" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/messages_navBtn"
+        android:layout_width="38dp"
+        android:layout_height="38dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginEnd="22dp"
+        android:background="@drawable/icon_mail"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/profileBtn"
+        app:layout_constraintTop_toTopOf="@+id/rectangle_1" />
+
+    <ImageView
+        android:id="@+id/plus_solid"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:translationZ="5dp"
+        app:layout_constraintBottom_toBottomOf="@+id/btnCreate"
+        app:layout_constraintEnd_toEndOf="@+id/btnCreate"
+        app:layout_constraintStart_toStartOf="@+id/btnCreate"
+        app:layout_constraintTop_toTopOf="@+id/btnCreate"
+        app:srcCompat="@drawable/icon_plus" />
+
+    <ImageView
+        android:id="@+id/profileBtn"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginEnd="35dp"
+        android:translationZ="5dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/rectangle_1"
+        app:srcCompat="@drawable/icon_plus" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnCreate"
+        android:visibility="gone"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginBottom="12dp"
+        android:background="@drawable/btn_yellow_circle"
+        android:elevation="4dp"
+        app:layout_constraintBottom_toBottomOf="@+id/rectangle_1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

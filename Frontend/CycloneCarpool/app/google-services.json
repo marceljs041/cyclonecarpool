@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "88899647005",
+    "project_id": "cyclonecarpool",
+    "storage_bucket": "cyclonecarpool.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:88899647005:android:bbf865ab4d6509e59238f4",
+        "android_client_info": {
+          "package_name": "com.example.cyclonecarpool"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCDnSPoJ082YzaFuNsFNIgWJUJiZLnvIFQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

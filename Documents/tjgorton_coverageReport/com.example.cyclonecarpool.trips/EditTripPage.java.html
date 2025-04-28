@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EditTripPage.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debug</a> &gt; <a href="index.source.html" class="el_package">com.example.cyclonecarpool.trips</a> &gt; <span class="el_source">EditTripPage.java</span></div><h1>EditTripPage.java</h1><pre class="source lang-java linenums">package com.example.cyclonecarpool.trips;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.cyclonecarpool.R;
+
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+<span class="nc" id="L27">public class EditTripPage extends AppCompatActivity implements View.OnClickListener {</span>
+
+    private Button editTripBtn;
+    private EditText fromInput, toInput, pickupInput, dateInput, timeInput, seatsInput, priceInput;
+    private CheckBox roundtripCheck, nosmokeCheck;
+
+    private Integer userId;
+    private String role;
+    private Long tripId;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+<span class="nc" id="L39">        super.onCreate(savedInstanceState);</span>
+
+<span class="nc" id="L41">        requestWindowFeature(Window.FEATURE_NO_TITLE);</span>
+<span class="nc" id="L42">        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);</span>
+<span class="nc" id="L43">        getSupportActionBar().hide();</span>
+
+<span class="nc" id="L45">        setContentView(R.layout.edit_trip_screen);</span>
+
+<span class="nc" id="L47">        Intent intent = getIntent();</span>
+<span class="nc bnc" id="L48" title="All 6 branches missed.">        if (intent != null &amp;&amp; intent.hasExtra(&quot;tripId&quot;) &amp;&amp; intent.hasExtra(&quot;userId&quot;)) {</span>
+<span class="nc" id="L49">            int tripIdInt = intent.getIntExtra(&quot;tripId&quot;, -1);</span>
+<span class="nc" id="L50">            tripId = (long) tripIdInt;</span>
+<span class="nc" id="L51">            userId = intent.getIntExtra(&quot;userId&quot;, -1);</span>
+<span class="nc" id="L52">            role = intent.getStringExtra(&quot;role&quot;);</span>
+<span class="nc" id="L53">            fetchTripDetails(tripId);</span>
+        }
+
+<span class="nc" id="L56">        editTripBtn = findViewById(R.id.btnEditTrip);</span>
+<span class="nc" id="L57">        fromInput = findViewById(R.id.fromEditInput);</span>
+<span class="nc" id="L58">        toInput = findViewById(R.id.toEditInput);</span>
+<span class="nc" id="L59">        pickupInput = findViewById(R.id.pickupEditInput);</span>
+<span class="nc" id="L60">        dateInput = findViewById(R.id.dateEditInput);</span>
+<span class="nc" id="L61">        timeInput = findViewById(R.id.timeEditInput);</span>
+<span class="nc" id="L62">        seatsInput = findViewById(R.id.seatsEditInput);</span>
+<span class="nc" id="L63">        priceInput = findViewById(R.id.priceEditInput);</span>
+<span class="nc" id="L64">        roundtripCheck = findViewById(R.id.checkBoxRoundTrip);</span>
+<span class="nc" id="L65">        nosmokeCheck = findViewById(R.id.checkBoxNoSmoke);</span>
+
+<span class="nc" id="L67">        editTripBtn.setOnClickListener(this);</span>
+<span class="nc" id="L68">    }</span>
+
+    private void fetchTripDetails(Long tripId) {
+<span class="nc" id="L71">        new Thread(() -&gt; {</span>
+            try {
+<span class="nc" id="L73">                URL url = new URL(&quot;http://coms-3090-029.class.las.iastate.edu:8080/api/trips/&quot; + tripId);</span>
+<span class="nc" id="L74">                HttpURLConnection conn = (HttpURLConnection) url.openConnection();</span>
+<span class="nc" id="L75">                conn.setRequestMethod(&quot;GET&quot;);</span>
+<span class="nc" id="L76">                conn.setRequestProperty(&quot;Accept&quot;, &quot;application/json&quot;);</span>
+
+<span class="nc" id="L78">                int responseCode = conn.getResponseCode();</span>
+<span class="nc bnc" id="L79" title="All 2 branches missed.">                if (responseCode == HttpURLConnection.HTTP_OK) {</span>
+<span class="nc" id="L80">                    BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));</span>
+<span class="nc" id="L81">                    StringBuilder response = new StringBuilder();</span>
+                    String inputLine;
+<span class="nc bnc" id="L83" title="All 2 branches missed.">                    while ((inputLine = in.readLine()) != null) {</span>
+<span class="nc" id="L84">                        response.append(inputLine);</span>
+                    }
+<span class="nc" id="L86">                    in.close();</span>
+
+<span class="nc" id="L88">                    JSONObject tripJson = new JSONObject(response.toString());</span>
+<span class="nc" id="L89">                    runOnUiThread(() -&gt; populateFields(tripJson));</span>
+
+<span class="nc" id="L91">                } else {</span>
+<span class="nc" id="L92">                    runOnUiThread(() -&gt; Toast.makeText(EditTripPage.this, &quot;Failed to load trip details.&quot;, Toast.LENGTH_SHORT).show());</span>
+                }
+<span class="nc" id="L94">            } catch (Exception e) {</span>
+<span class="nc" id="L95">                runOnUiThread(() -&gt; Toast.makeText(EditTripPage.this, &quot;Error: &quot; + e.getMessage(), Toast.LENGTH_LONG).show());</span>
+<span class="nc" id="L96">            }</span>
+<span class="nc" id="L97">        }).start();</span>
+<span class="nc" id="L98">    }</span>
+
+    private void populateFields(JSONObject tripJson) {
+        try {
+<span class="nc" id="L102">            fromInput.setText(tripJson.getString(&quot;startLocation&quot;));</span>
+<span class="nc" id="L103">            toInput.setText(tripJson.getString(&quot;endLocation&quot;));</span>
+<span class="nc" id="L104">            pickupInput.setText(tripJson.getString(&quot;pickUp&quot;));</span>
+
+<span class="nc" id="L106">            String dateTime = tripJson.getString(&quot;time&quot;);</span>
+<span class="nc" id="L107">            SimpleDateFormat dateFormat = new SimpleDateFormat(&quot;yyyy-MM-dd'T'HH:mm:ss&quot;);</span>
+<span class="nc" id="L108">            Date date = dateFormat.parse(dateTime);</span>
+<span class="nc" id="L109">            SimpleDateFormat dateFormatter = new SimpleDateFormat(&quot;yyyy-MM-dd&quot;);</span>
+<span class="nc" id="L110">            SimpleDateFormat timeFormatter = new SimpleDateFormat(&quot;HH:mm&quot;);</span>
+
+<span class="nc" id="L112">            dateInput.setText(dateFormatter.format(date));</span>
+<span class="nc" id="L113">            timeInput.setText(timeFormatter.format(date));</span>
+
+<span class="nc" id="L115">            seatsInput.setText(String.valueOf(tripJson.getInt(&quot;seat&quot;)));</span>
+<span class="nc" id="L116">            priceInput.setText(String.valueOf(tripJson.getInt(&quot;price&quot;)));</span>
+<span class="nc" id="L117">            roundtripCheck.setChecked(tripJson.getBoolean(&quot;roundTrip&quot;));</span>
+<span class="nc" id="L118">            nosmokeCheck.setChecked(tripJson.getBoolean(&quot;noSmoke&quot;));</span>
+
+<span class="nc" id="L120">        } catch (Exception e) {</span>
+<span class="nc" id="L121">            Toast.makeText(this, &quot;Error parsing trip details.&quot;, Toast.LENGTH_LONG).show();</span>
+<span class="nc" id="L122">        }</span>
+<span class="nc" id="L123">    }</span>
+
+    @Override
+    public void onClick(View v) {
+<span class="nc bnc" id="L127" title="All 2 branches missed.">        if (v.getId() == R.id.btnEditTrip) {</span>
+            try {
+<span class="nc" id="L129">                String from = fromInput.getText().toString();</span>
+<span class="nc" id="L130">                String to = toInput.getText().toString();</span>
+<span class="nc" id="L131">                String pickup = pickupInput.getText().toString();</span>
+<span class="nc" id="L132">                String date = dateInput.getText().toString();</span>
+<span class="nc" id="L133">                String time = timeInput.getText().toString();</span>
+<span class="nc" id="L134">                Integer seats = Integer.parseInt(seatsInput.getText().toString());</span>
+<span class="nc" id="L135">                Integer price = Integer.parseInt(priceInput.getText().toString());</span>
+<span class="nc" id="L136">                Boolean roundTrip = roundtripCheck.isChecked();</span>
+<span class="nc" id="L137">                Boolean noSmoke = nosmokeCheck.isChecked();</span>
+
+<span class="nc" id="L139">                String dateTime = formatDateTime(date, time);</span>
+
+<span class="nc" id="L141">                TripItem updatedTrip = new TripItem(tripId.intValue(), to, from, dateTime, pickup, userId, seats, price, roundTrip, noSmoke);</span>
+<span class="nc" id="L142">                sendUpdatedTripToBackend(updatedTrip);</span>
+
+<span class="nc" id="L144">            } catch (Exception e) {</span>
+<span class="nc" id="L145">                Toast.makeText(this, &quot;Error: &quot; + e.getMessage(), Toast.LENGTH_LONG).show();</span>
+<span class="nc" id="L146">            }</span>
+        }
+<span class="nc" id="L148">    }</span>
+
+    private String formatDateTime(String date, String time) throws Exception {
+<span class="nc" id="L151">        SimpleDateFormat inputFormat = new SimpleDateFormat(&quot;yyyy-MM-dd HH:mm&quot;);</span>
+<span class="nc" id="L152">        SimpleDateFormat outputFormat = new SimpleDateFormat(&quot;yyyy-MM-dd'T'HH:mm:ss&quot;);</span>
+<span class="nc" id="L153">        Date parsedDate = inputFormat.parse(date + &quot; &quot; + time);</span>
+<span class="nc" id="L154">        return outputFormat.format(parsedDate);</span>
+    }
+
+    private void sendUpdatedTripToBackend(TripItem trip) {
+<span class="nc" id="L158">        new Thread(() -&gt; {</span>
+            try {
+<span class="nc" id="L160">                URL url = new URL(&quot;http://coms-3090-029.class.las.iastate.edu:8080/api/trips/mytrip/&quot; + tripId);</span>
+<span class="nc" id="L161">                HttpURLConnection conn = (HttpURLConnection) url.openConnection();</span>
+<span class="nc" id="L162">                conn.setRequestMethod(&quot;PUT&quot;);</span>
+<span class="nc" id="L163">                conn.setRequestProperty(&quot;Content-Type&quot;, &quot;application/json; utf-8&quot;);</span>
+<span class="nc" id="L164">                conn.setRequestProperty(&quot;Accept&quot;, &quot;application/json&quot;);</span>
+<span class="nc" id="L165">                conn.setDoOutput(true);</span>
+
+<span class="nc" id="L167">                JSONObject tripJson = new JSONObject();</span>
+<span class="nc" id="L168">                tripJson.put(&quot;driverId&quot;, trip.getCreatorUserId());</span>
+<span class="nc" id="L169">                tripJson.put(&quot;startLocation&quot;, trip.getFromLoco());</span>
+<span class="nc" id="L170">                tripJson.put(&quot;endLocation&quot;, trip.getToLoco());</span>
+<span class="nc" id="L171">                tripJson.put(&quot;pickUp&quot;, trip.getPickUpLoco());</span>
+<span class="nc" id="L172">                tripJson.put(&quot;time&quot;, trip.getDateTime());</span>
+<span class="nc" id="L173">                tripJson.put(&quot;seat&quot;, trip.getSeatsAvailable());</span>
+<span class="nc" id="L174">                tripJson.put(&quot;price&quot;, trip.getPrice());</span>
+<span class="nc" id="L175">                tripJson.put(&quot;roundTrip&quot;, trip.getRoundTrip());</span>
+<span class="nc" id="L176">                tripJson.put(&quot;noSmoke&quot;, trip.getNoSmoke());</span>
+
+<span class="nc" id="L178">                try (OutputStream os = conn.getOutputStream()) {</span>
+<span class="nc" id="L179">                    byte[] input = tripJson.toString().getBytes(&quot;utf-8&quot;);</span>
+<span class="nc" id="L180">                    os.write(input, 0, input.length);</span>
+                }
+
+<span class="nc" id="L183">                int responseCode = conn.getResponseCode();</span>
+<span class="nc bnc" id="L184" title="All 2 branches missed.">                if (responseCode == HttpURLConnection.HTTP_OK) {</span>
+<span class="nc" id="L185">                    runOnUiThread(() -&gt; {</span>
+<span class="nc" id="L186">                        Toast.makeText(EditTripPage.this, &quot;Trip updated successfully!&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc" id="L187">                        finish();</span>
+<span class="nc" id="L188">                    });</span>
+                } else {
+<span class="nc" id="L190">                    runOnUiThread(() -&gt; Toast.makeText(EditTripPage.this, &quot;Failed to update trip. Response Code: &quot; + responseCode, Toast.LENGTH_SHORT).show());</span>
+                }
+
+<span class="nc" id="L193">            } catch (Exception e) {</span>
+<span class="nc" id="L194">                runOnUiThread(() -&gt; Toast.makeText(EditTripPage.this, &quot;Error: &quot; + e.getMessage(), Toast.LENGTH_LONG).show());</span>
+<span class="nc" id="L195">            }</span>
+<span class="nc" id="L196">        }).start();</span>
+<span class="nc" id="L197">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span>Generated by the Android Gradle plugin 8.5.2</div></body></html>

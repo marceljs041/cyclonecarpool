@@ -1,0 +1,169 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PaymentGatewayService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">cycloneCarpool.Payments</a>
+</div>
+
+<h1>Coverage Summary for Class: PaymentGatewayService (cycloneCarpool.Payments)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PaymentGatewayService</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    5%
+  </span>
+  <span class="absValue">
+    (1/20)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package cycloneCarpool.Payments;
+&nbsp;
+&nbsp;import com.stripe.Stripe;
+&nbsp;import com.stripe.exception.StripeException;
+&nbsp;import com.stripe.model.PaymentIntent;
+&nbsp;import com.stripe.model.Charge;
+&nbsp;import com.stripe.param.ChargeListParams;
+&nbsp;import com.stripe.param.PaymentIntentCreateParams;
+&nbsp;import org.springframework.beans.factory.annotation.Value;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;@Service
+<b class="fc">&nbsp;public class PaymentGatewayService {</b>
+&nbsp;
+&nbsp;    @Value(&quot;${stripe.api.key}&quot;)
+&nbsp;    private String stripeApiKey;
+&nbsp;
+&nbsp;    public String createPayment(Double amount, String paymentMethod) {
+<b class="nc">&nbsp;        Stripe.apiKey = stripeApiKey;</b>
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()</b>
+<b class="nc">&nbsp;                    .setAmount((long) (amount * 100)) // Convert to the smallest currency unit</b>
+<b class="nc">&nbsp;                    .setCurrency(&quot;usd&quot;)</b>
+<b class="nc">&nbsp;                    .setDescription(&quot;Payment for trip&quot;)</b>
+<b class="nc">&nbsp;                    .setPaymentMethod(paymentMethod)</b>
+<b class="nc">&nbsp;                    .setConfirm(true)</b>
+<b class="nc">&nbsp;                    .build();</b>
+&nbsp;
+&nbsp;            // Create and confirm the PaymentIntent
+<b class="nc">&nbsp;            PaymentIntent paymentIntent = PaymentIntent.create(params);</b>
+&nbsp;            // paymentIntent = paymentIntent.confirm();
+&nbsp;
+&nbsp;            // Check if the PaymentIntent is successful
+<b class="nc">&nbsp;            if (&quot;succeeded&quot;.equals(paymentIntent.getStatus())) {</b>
+&nbsp;                // Get the receipt URL from associated charges if available
+<b class="nc">&nbsp;                ChargeListParams chargeListParams = ChargeListParams.builder()</b>
+<b class="nc">&nbsp;                        .setPaymentIntent(paymentIntent.getId())</b>
+<b class="nc">&nbsp;                        .build();</b>
+&nbsp;
+<b class="nc">&nbsp;                List&lt;Charge&gt; charges = Charge.list(chargeListParams).getData();</b>
+<b class="nc">&nbsp;                if (!charges.isEmpty()) {</b>
+<b class="nc">&nbsp;                    return charges.get(0).getReceiptUrl();</b>
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;            throw new RuntimeException(&quot;Payment was not successful&quot;);</b>
+<b class="nc">&nbsp;        } catch (StripeException e) {</b>
+<b class="nc">&nbsp;            throw new RuntimeException(&quot;Failed to create payment: &quot; + e.getMessage(), e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-12-04 23:48</div>
+</div>
+</body>
+</html>

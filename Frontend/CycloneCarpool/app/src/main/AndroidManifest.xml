@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.CycloneCarpool"
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:usesCleartextTraffic="true"
+        android:enableOnBackInvokedCallback="true"
+        tools:targetApi="31">
+        <activity
+            android:name=".user.WelcomePage"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".user.SignIn" />
+        <activity android:name=".user.SignUp" />
+        <activity android:name=".HomePage" />
+        <activity android:name=".trips.MyTripPage" />
+        <activity android:name=".trips.EditTripPage" />
+        <activity android:name=".trips.TripInfoPage" />
+        <activity android:name=".reviews.ReviewPage" />
+        <activity android:name=".trips.CreateTripPage" />
+        <activity android:name=".chat.ChatsPage" />
+        <activity android:name=".chat.MessagingPage" />
+        <activity android:name=".user.ProfilePage" />
+        <activity android:name=".user.Payments" />
+    </application>
+
+</manifest>

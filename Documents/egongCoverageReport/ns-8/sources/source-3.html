@@ -1,0 +1,264 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > UserController</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">cycloneCarpool.Users</a>
+</div>
+
+<h1>Coverage Summary for Class: UserController (cycloneCarpool.Users)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UserController</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    58.3%
+  </span>
+  <span class="absValue">
+    (7/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    71.4%
+  </span>
+  <span class="absValue">
+    (25/35)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package cycloneCarpool.Users;
+&nbsp;
+&nbsp;import io.swagger.v3.oas.annotations.Operation;
+&nbsp;import io.swagger.v3.oas.annotations.tags.Tag;
+&nbsp;import cycloneCarpool.Reviews.Review;
+&nbsp;import cycloneCarpool.Reviews.ReviewService;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.http.HttpStatus;
+&nbsp;import org.springframework.http.ResponseEntity;
+&nbsp;import org.springframework.web.bind.annotation.*;
+&nbsp;
+&nbsp;import javax.naming.AuthenticationException;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;
+&nbsp;@Tag(name = &quot;User Controller&quot;, description = &quot;Operations related to users&quot;)
+&nbsp;@RestController
+&nbsp;@RequestMapping(&quot;/api/users&quot;)
+<b class="fc">&nbsp;public class UserController {</b>
+&nbsp;
+&nbsp;    @Autowired
+&nbsp;    private UserService userService;
+&nbsp;
+&nbsp;    @Autowired
+&nbsp;    private ReviewService reviewService;
+&nbsp;
+&nbsp;
+&nbsp;    // Endpoint for user signup
+&nbsp;    @Operation(summary = &quot;Register a new user&quot;, description = &quot;Creates a new user with the provided details.&quot;)
+&nbsp;    @PostMapping(&quot;/signup&quot;)
+&nbsp;    public ResponseEntity&lt;User&gt; signup(@RequestBody User user) {
+<b class="fc">&nbsp;        User newUser = userService.registerUser(user);</b>
+<b class="fc">&nbsp;        return new ResponseEntity&lt;&gt;(newUser, HttpStatus.CREATED);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // Signin returns also user information if authentication is successful
+&nbsp;    @Operation(summary = &quot;Sign In as an Existing User&quot;, description = &quot;Collects user information of the user signed in and signs into the application.&quot;)
+&nbsp;    @PostMapping(&quot;/signin&quot;)
+&nbsp;    public ResponseEntity&lt;User&gt; signin(@RequestBody SignInRequest signInRequest) {
+&nbsp;        try {
+<b class="fc">&nbsp;            String email = signInRequest.getEmail();</b>
+<b class="fc">&nbsp;            String password = signInRequest.getPassword();</b>
+&nbsp;            // Validate user with the extracted data
+<b class="fc">&nbsp;            User existingUser = userService.validateUser(email, password);</b>
+&nbsp;
+<b class="fc">&nbsp;            return ResponseEntity.ok(existingUser);</b>
+<b class="fc">&nbsp;        } catch (AuthenticationException e) {</b>
+<b class="fc">&nbsp;            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();  // 401 Unauthorized</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    // GET method to fetch all users
+&nbsp;    @Operation(summary = &quot;Get all User information&quot;, description = &quot;Get method to get all of the Users information that are in the database&quot;)
+&nbsp;    @GetMapping
+&nbsp;    public ResponseEntity&lt;List&lt;User&gt;&gt; getAllUsers() {
+<b class="nc">&nbsp;        List&lt;User&gt; users = userService.getAllUsers();</b>
+<b class="nc">&nbsp;        return ResponseEntity.ok(users);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // GET method to fetch all emails
+&nbsp;    @Operation(summary = &quot;Get All active emails for signup purposes&quot;, description = &quot;Gets a JSON object of all the emails currently registered so no duplicate emails can be used.&quot;)
+&nbsp;    @GetMapping(&quot;/emails&quot;)
+&nbsp;    public ResponseEntity&lt;List&lt;String&gt;&gt; getAllEmails() {
+<b class="nc">&nbsp;        List&lt;String&gt; emails = userService.getAllEmails();</b>
+<b class="nc">&nbsp;        return ResponseEntity.ok(emails);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Operation(summary = &quot;Gets specific user information&quot;, description = &quot;Returns JSON of User information by the given ID&quot;)
+&nbsp;    @GetMapping(&quot;/{id}&quot;)
+&nbsp;    public ResponseEntity&lt;User&gt; getUserById(@PathVariable Long id) {
+<b class="fc">&nbsp;        User user = userService.getUserById(id);</b>
+<b class="fc">&nbsp;        return ResponseEntity.ok(user);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // DELETE method to delete a user by ID
+&nbsp;    @Operation(summary = &quot;Delete single user by id&quot;, description = &quot;Remove user info from database for a single user by the given user&#39;s id.&quot;)
+&nbsp;    @DeleteMapping(&quot;/{id}&quot;)
+&nbsp;    public ResponseEntity&lt;Void&gt; deleteUserById(@PathVariable Long id) {
+<b class="fc">&nbsp;        boolean isDeleted = userService.deleteUserById(id);</b>
+<b class="fc">&nbsp;        if (isDeleted) {</b>
+<b class="fc">&nbsp;            return ResponseEntity.noContent().build();  // 204 No Content if successful</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            return ResponseEntity.notFound().build();  // 404 Not Found if user not found</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Operation(summary = &quot;Update single user to Driver role, if applicable&quot;, description = &quot;Check if user exists and if a Passenger.&quot; +
+&nbsp;            &quot;if True change role for that user in the database to Driver and responds OK, else responds with a badRequest.&quot;)
+&nbsp;    @GetMapping(&quot;/{id}/update&quot;)
+&nbsp;    public ResponseEntity&lt;User&gt; updateUserToDriver(@PathVariable Long id) {
+<b class="fc">&nbsp;        User user = userService.getUserById(id);</b>
+<b class="fc">&nbsp;        if (Objects.equals(user.getRole(), &quot;Passenger&quot;)) {</b>
+<b class="fc">&nbsp;            user.setRole(&quot;Driver&quot;);</b>
+<b class="fc">&nbsp;            User updatedUser = userService.editProfile(id, user);</b>
+<b class="fc">&nbsp;            return ResponseEntity.ok(updatedUser);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return ResponseEntity.badRequest().build();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Operation(summary = &quot;Get single user&#39;s profile picture by id&quot;, description = &quot;Get user&#39;s profile picture from database for a single user by the given user&#39;s id.&quot;)
+&nbsp;    @GetMapping(&quot;/profilePic/{id}&quot;)
+&nbsp;    public ResponseEntity&lt;String&gt; getProfilePicById(@PathVariable Long id) {
+<b class="nc">&nbsp;        String ProfilePicture = userService.getPictureById(id);</b>
+<b class="nc">&nbsp;        return ResponseEntity.ok(ProfilePicture);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Operation(summary = &quot;Update single user info by id&quot;, description = &quot;Update single user info in the database given user&#39;s id, with the provided content.&quot;)
+&nbsp;    @PutMapping(&quot;/editProfile/{id}&quot;)
+&nbsp;    public ResponseEntity&lt;User&gt; editProfile(@PathVariable Long id, @RequestBody User userDetails) {
+&nbsp;        // Delegate the logic to UserService
+<b class="fc">&nbsp;        User updatedUser = userService.editProfile(id, userDetails);</b>
+<b class="fc">&nbsp;        if (updatedUser != null) {</b>
+<b class="fc">&nbsp;            return ResponseEntity.ok(updatedUser);</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            return ResponseEntity.notFound().build();  // Return 404 if the user is not found</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    // Additional methods for reviews(receiver side)
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Reviewer : Anthony Campana
+&nbsp;     * Retrieves the average rating for a user based on reviews they received.
+&nbsp;     * @param id
+&nbsp;     * @return Rating for specific user (id)
+&nbsp;     */
+&nbsp;    @Operation(summary = &quot;Get single review by review id&quot;, description = &quot;Get review info from database for a single review by the given review&#39;s id.&quot;)
+&nbsp;    @GetMapping(&quot;/{id}/review&quot;)
+&nbsp;    public ResponseEntity&lt;Double&gt; getRatingById(@PathVariable Long id) {
+<b class="nc">&nbsp;        double rating = reviewService.getReceiverRating(id);</b>
+<b class="nc">&nbsp;        return ResponseEntity.ok(rating);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Reviewer : Anthony Campana
+&nbsp;     * Retrieves the reviews that were all sent to the specific user ID.
+&nbsp;     * @param id
+&nbsp;     * @return List of reviews sent to specific user (id)
+&nbsp;     */
+&nbsp;    @Operation(summary = &quot;Get single user&#39;s reviews by id&quot;, description = &quot;Get reviews from database for a single user by the given user&#39;s id.&quot;)
+&nbsp;    @GetMapping(&quot;/{id}/review/content&quot;)
+&nbsp;    public ResponseEntity&lt;List&lt;Review&gt;&gt; getReviewReceivedById(@PathVariable Long id) {
+<b class="nc">&nbsp;        List&lt;Review&gt; reviews = reviewService.getReviewByReceiverId(id);</b>
+<b class="nc">&nbsp;        return ResponseEntity.ok(reviews);</b>
+&nbsp;    }
+&nbsp;    
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-12-04 21:23</div>
+</div>
+</body>
+</html>

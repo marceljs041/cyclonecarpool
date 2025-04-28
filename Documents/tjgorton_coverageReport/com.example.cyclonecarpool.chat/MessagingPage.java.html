@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MessagingPage.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debug</a> &gt; <a href="index.source.html" class="el_package">com.example.cyclonecarpool.chat</a> &gt; <span class="el_source">MessagingPage.java</span></div><h1>MessagingPage.java</h1><pre class="source lang-java linenums">package com.example.cyclonecarpool.chat;
+
+import android.content.Intent;
+import android.graphics.Color;
+import android.net.Uri;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+import com.example.cyclonecarpool.utils.API;
+import com.example.cyclonecarpool.utils.CircleBorderTransform;
+import com.example.cyclonecarpool.trips.CreateTripPage;
+import com.example.cyclonecarpool.HomePage;
+import com.example.cyclonecarpool.trips.MyTripPage;
+import com.example.cyclonecarpool.user.ProfilePage;
+import com.example.cyclonecarpool.R;
+import com.example.cyclonecarpool.utils.ImageHelper;
+import com.example.cyclonecarpool.utils.VolleySingleton;
+import com.google.gson.Gson;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
+
+<span class="nc" id="L52">public class MessagingPage extends AppCompatActivity implements WebSocketHelper.WebSocketListener, View.OnClickListener {</span>
+	private WebSocketHelper webSocketHelper;
+	private String webSocketUrl;
+
+<span class="nc" id="L56">	public String role = null;</span>
+<span class="nc" id="L57">	public Integer userId = null;</span>
+	public Integer otherUserId;
+
+	private Button homeNavBtn, tripsNavBtn, messagesTripBtn;
+	private LinearLayout messageContainer;
+	private ScrollView messageScrollView;
+	private ImageView profileBtn;
+
+	private EditText msgInput;
+	private Button msgSendBtn, msgEditConfirmBtn;
+
+	private Long messageId;
+<span class="nc" id="L69">	private final Gson gson = new Gson();</span>
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+<span class="nc" id="L73">		super.onCreate(savedInstanceState);</span>
+
+<span class="nc" id="L75">		requestWindowFeature(Window.FEATURE_NO_TITLE);</span>
+<span class="nc" id="L76">		this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,</span>
+				WindowManager.LayoutParams.FLAG_FULLSCREEN);
+<span class="nc" id="L78">		getSupportActionBar().hide();</span>
+
+<span class="nc" id="L80">		Intent intent = getIntent();</span>
+<span class="nc bnc" id="L81" title="All 6 branches missed.">		if (intent != null &amp;&amp; intent.hasExtra(&quot;userId&quot;) &amp;&amp; intent.hasExtra(&quot;role&quot;)) {</span>
+<span class="nc" id="L82">			userId = intent.getIntExtra(&quot;userId&quot;, -1);</span>
+<span class="nc" id="L83">			role = intent.getStringExtra(&quot;role&quot;);</span>
+<span class="nc" id="L84">			otherUserId = intent.getIntExtra(&quot;otherId&quot;, -1);</span>
+<span class="nc" id="L85">			System.out.println(otherUserId);</span>
+		}
+
+<span class="nc" id="L88">		setContentView(R.layout.message_screen);</span>
+
+<span class="nc" id="L90">		messageContainer = findViewById(R.id.message_Container);</span>
+<span class="nc" id="L91">		messageScrollView = findViewById(R.id.messageScrollView);</span>
+
+<span class="nc" id="L93">		homeNavBtn = findViewById(R.id.house_navBtn);</span>
+<span class="nc" id="L94">		tripsNavBtn = findViewById(R.id.trips_navBtn);</span>
+<span class="nc" id="L95">		messagesTripBtn = findViewById(R.id.messages_navBtn);</span>
+<span class="nc" id="L96">		profileBtn = findViewById(R.id.profileBtn);</span>
+
+<span class="nc" id="L98">		msgInput = findViewById(R.id.message_input);</span>
+<span class="nc" id="L99">		msgSendBtn = findViewById(R.id.message_send);</span>
+<span class="nc" id="L100">		msgEditConfirmBtn = findViewById(R.id.message_edit_confirm);</span>
+
+<span class="nc" id="L102">		homeNavBtn.setOnClickListener(this);</span>
+<span class="nc" id="L103">		tripsNavBtn.setOnClickListener(this);</span>
+<span class="nc" id="L104">		messagesTripBtn.setOnClickListener(this);</span>
+<span class="nc" id="L105">		profileBtn.setOnClickListener(this);</span>
+
+<span class="nc" id="L107">		msgSendBtn.setOnClickListener(view -&gt; {</span>
+<span class="nc" id="L108">			String msgText = msgInput.getText().toString();</span>
+<span class="nc bnc" id="L109" title="All 2 branches missed.">			if (!msgText.isEmpty()) {</span>
+<span class="nc" id="L110">				sendMessageWebSocket(msgText);</span>
+<span class="nc" id="L111">				msgInput.setText(&quot;&quot;);</span>
+			}
+<span class="nc" id="L113">		});</span>
+
+<span class="nc" id="L115">		msgEditConfirmBtn.setOnClickListener(view -&gt; {</span>
+<span class="nc" id="L116">			String newContent = msgInput.getText().toString();</span>
+<span class="nc" id="L117">			editMessageReq(messageId, newContent);</span>
+<span class="nc" id="L118">		});</span>
+
+		// Fetch message history before establishing WebSocket connection
+<span class="nc" id="L121">		fetchMessageHistory();</span>
+
+		// WebSocket URL setup and connection
+<span class="nc" id="L124">		webSocketUrl = &quot;ws://coms-3090-029.class.las.iastate.edu:8080/chat/&quot; + otherUserId + &quot;/&quot; + userId;</span>
+<span class="nc" id="L125">		webSocketHelper = new WebSocketHelper(webSocketUrl, this);</span>
+<span class="nc" id="L126">		webSocketHelper.connect();</span>
+
+<span class="nc" id="L128">		makeProfilePicReq();</span>
+<span class="nc" id="L129">	}</span>
+
+	private void fetchMessageHistory() {
+<span class="nc" id="L132">		String historyUrl = API.MSG_URL + &quot;conversation/&quot; + userId + &quot;/&quot; + otherUserId;</span>
+<span class="nc" id="L133">		JsonArrayRequest historyRequest = new JsonArrayRequest(</span>
+				Request.Method.GET,
+				historyUrl,
+				null,
+				response -&gt; {
+					try {
+<span class="nc bnc" id="L139" title="All 2 branches missed.">						for (int i = 0; i &lt; response.length(); i++) {</span>
+<span class="nc" id="L140">							MessageItem msgItem = gson.fromJson(response.get(i).toString(), MessageItem.class);</span>
+
+							// Check if the logged-in user is the sender
+<span class="nc" id="L143">							boolean isSender = msgItem.getSenderId().equals(userId);</span>
+
+							// Extract message content, handling nested JSON if necessary
+							String content;
+							try {
+<span class="nc" id="L148">								JSONObject contentObj = new JSONObject(msgItem.getMessage());</span>
+<span class="nc" id="L149">								content = contentObj.getString(&quot;content&quot;);</span>
+<span class="nc" id="L150">							} catch (JSONException e) {</span>
+<span class="nc" id="L151">								content = msgItem.getMessage();</span>
+<span class="nc" id="L152">							}</span>
+
+							// Display the message aligned based on sender status
+<span class="nc" id="L155">							addMessageToUI(content, isSender);</span>
+						}
+<span class="nc" id="L157">					} catch (JSONException e) {</span>
+<span class="nc" id="L158">						Log.e(&quot;MessagingPage&quot;, &quot;Error parsing history&quot;, e);</span>
+<span class="nc" id="L159">					}</span>
+<span class="nc" id="L160">				},</span>
+<span class="nc" id="L161">				error -&gt; Log.e(&quot;MessagingPage&quot;, &quot;Error fetching message history&quot;, error)</span>
+		);
+<span class="nc" id="L163">		VolleySingleton.getInstance(getApplicationContext()).addToRequestQueue(historyRequest);</span>
+<span class="nc" id="L164">	}</span>
+
+
+
+	private void sendMessageWebSocket(String messageContent) {
+<span class="nc" id="L169">		JSONObject messageObj = new JSONObject();</span>
+		try {
+<span class="nc" id="L171">			messageObj.put(&quot;senderId&quot;, userId);</span>
+<span class="nc" id="L172">			messageObj.put(&quot;receiverId&quot;, otherUserId);</span>
+<span class="nc" id="L173">			messageObj.put(&quot;content&quot;, messageContent);</span>
+<span class="nc" id="L174">		} catch (JSONException e) {</span>
+<span class="nc" id="L175">			e.printStackTrace();</span>
+<span class="nc" id="L176">		}</span>
+<span class="nc" id="L177">		webSocketHelper.sendMessage(messageObj.toString());</span>
+<span class="nc" id="L178">	}</span>
+
+	@Override
+	public void onMessageReceived(String message) {
+<span class="nc" id="L182">		runOnUiThread(() -&gt; {</span>
+			try {
+				// Separate the prefix from the JSON content using regex to find the JSON part
+<span class="nc" id="L185">				int jsonStartIndex = message.indexOf(&quot;{&quot;);</span>
+<span class="nc bnc" id="L186" title="All 2 branches missed.">				if (jsonStartIndex == -1) {</span>
+					// No JSON found, display message as plain text
+<span class="nc" id="L188">					addMessageToUI(message, false);</span>
+<span class="nc" id="L189">					return;</span>
+				}
+
+				// Extract the sender name (prefix) and JSON content
+<span class="nc" id="L193">				String prefix = message.substring(0, jsonStartIndex).trim();</span>
+<span class="nc" id="L194">				String jsonContent = message.substring(jsonStartIndex);</span>
+
+				// Parse the JSON part
+<span class="nc" id="L197">				JSONObject msgObj = new JSONObject(jsonContent);</span>
+<span class="nc" id="L198">				String content = msgObj.getString(&quot;content&quot;);</span>
+<span class="nc bnc" id="L199" title="All 2 branches missed.">				boolean isSender = msgObj.getInt(&quot;senderId&quot;) == userId;</span>
+
+				// Display the message in the format &quot;Prefix: Message Content&quot;
+<span class="nc" id="L202">				addMessageToUI(prefix + &quot;: &quot; + content, isSender);</span>
+
+<span class="nc" id="L204">			} catch (JSONException e) {</span>
+<span class="nc" id="L205">				Log.e(&quot;MessagingPage&quot;, &quot;Error parsing incoming WebSocket message&quot;, e);</span>
+				// Display the raw message as fallback if parsing fails
+<span class="nc" id="L207">				addMessageToUI(message, false);</span>
+<span class="nc" id="L208">			}</span>
+<span class="nc" id="L209">		});</span>
+<span class="nc" id="L210">	}</span>
+
+
+
+
+	private void addMessageToUI(String messageText, boolean isSender) {
+		// Inflate the appropriate layout based on sender status
+<span class="nc" id="L217">		View msgItemView = LayoutInflater.from(this)</span>
+<span class="nc bnc" id="L218" title="All 2 branches missed.">				.inflate(isSender ? R.layout.message_sent_item : R.layout.message_received_item, messageContainer, false);</span>
+
+<span class="nc" id="L220">		TextView messageTextView = msgItemView.findViewById(R.id.message);</span>
+<span class="nc" id="L221">		messageTextView.setText(messageText);</span>
+
+<span class="nc" id="L223">		messageContainer.addView(msgItemView);</span>
+<span class="nc" id="L224">		messageScrollView.post(() -&gt; messageScrollView.fullScroll(View.FOCUS_DOWN)); // Auto-scroll to latest message</span>
+<span class="nc" id="L225">	}</span>
+
+
+
+	@Override
+	protected void onDestroy() {
+<span class="nc" id="L231">		super.onDestroy();</span>
+<span class="nc" id="L232">		webSocketHelper.close();</span>
+<span class="nc" id="L233">	}</span>
+
+	@Override
+	public void onClick(View v) {
+<span class="nc" id="L237">		int id = v.getId();</span>
+		Intent intent;
+<span class="nc bnc" id="L239" title="All 2 branches missed.">		if (id == R.id.house_navBtn) {</span>
+<span class="nc" id="L240">			intent = new Intent(this, HomePage.class);</span>
+<span class="nc bnc" id="L241" title="All 2 branches missed.">		} else if (id == R.id.trips_navBtn) {</span>
+<span class="nc" id="L242">			intent = new Intent(this, MyTripPage.class);</span>
+<span class="nc bnc" id="L243" title="All 2 branches missed.">		} else if (id == R.id.messages_navBtn) {</span>
+<span class="nc" id="L244">			intent = new Intent(this, ChatsPage.class);</span>
+<span class="nc bnc" id="L245" title="All 2 branches missed.">		} else if (id == R.id.profileBtn) {</span>
+<span class="nc" id="L246">			intent = new Intent(this, ProfilePage.class);</span>
+		} else {
+<span class="nc" id="L248">			return;</span>
+		}
+<span class="nc" id="L250">		intent.putExtra(&quot;userId&quot;, userId);</span>
+<span class="nc" id="L251">		intent.putExtra(&quot;role&quot;, role);</span>
+<span class="nc" id="L252">		startActivity(intent);</span>
+<span class="nc" id="L253">	}</span>
+
+	private void editMessageReq(Long msgId, String newMsg) {
+<span class="nc" id="L256">		StringRequest editMsgRequest = new StringRequest(</span>
+				Request.Method.PUT,
+<span class="nc" id="L258">				String.format(API.MSG_URL + &quot;edit/%d?newContent=%s&quot;, msgId, newMsg),</span>
+<span class="nc" id="L259">				response -&gt; Log.d(&quot;[Messages] Volley Response&quot;, response),</span>
+<span class="nc" id="L260">				error -&gt; Log.e(&quot;[Messages] Volley Error&quot;, error.toString())</span>
+		);
+<span class="nc" id="L262">		VolleySingleton.getInstance(getApplicationContext()).addToRequestQueue(editMsgRequest);</span>
+<span class="nc" id="L263">	}</span>
+
+	private void makeProfilePicReq() {
+<span class="nc" id="L266">		new Thread(() -&gt; {</span>
+			try {
+<span class="nc" id="L268">				URL url = new URL(API.USER_URL + &quot;profilePic/&quot; + userId);</span>
+<span class="nc" id="L269">				HttpURLConnection conn = (HttpURLConnection) url.openConnection();</span>
+<span class="nc" id="L270">				conn.setRequestMethod(&quot;GET&quot;);</span>
+<span class="nc" id="L271">				conn.setConnectTimeout(5000);</span>
+<span class="nc" id="L272">				conn.setReadTimeout(5000);</span>
+
+<span class="nc" id="L274">				int responseCode = conn.getResponseCode();</span>
+<span class="nc bnc" id="L275" title="All 2 branches missed.">				if (responseCode == HttpURLConnection.HTTP_OK) {</span>
+<span class="nc" id="L276">					BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));</span>
+<span class="nc" id="L277">					StringBuilder response = new StringBuilder();</span>
+					String inputLine;
+<span class="nc bnc" id="L279" title="All 2 branches missed.">					while ((inputLine = in.readLine()) != null) {</span>
+<span class="nc" id="L280">						response.append(inputLine);</span>
+					}
+<span class="nc" id="L282">					in.close();</span>
+
+<span class="nc" id="L284">					String profilePicUrl = response.toString().trim();</span>
+<span class="nc" id="L285">					runOnUiThread(() -&gt; ImageHelper.loadProfilePic(MessagingPage.this, profilePicUrl, profileBtn));</span>
+<span class="nc" id="L286">				} else {</span>
+<span class="nc" id="L287">					Log.e(&quot;HTTP Request&quot;, &quot;Failed to get profile picture. Response Code: &quot; + responseCode);</span>
+				}
+<span class="nc" id="L289">			} catch (Exception e) {</span>
+<span class="nc" id="L290">				Log.e(&quot;HTTP Request&quot;, &quot;Error fetching profile picture&quot;, e);</span>
+<span class="nc" id="L291">			}</span>
+<span class="nc" id="L292">		}).start();</span>
+<span class="nc" id="L293">	}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span>Generated by the Android Gradle plugin 8.5.2</div></body></html>
